@@ -102,9 +102,9 @@
 #' \item \link{detectlayers_eg} detects the number of information layers present
 #' in the trade-data using the algorithm in
 #' \insertCite{Ersan2022a;textual}{PINstimation}.
-#' \item \link{detectlayers_ecm} detects the number of information layers present
-#' in the trade-data using the expectation-conditional maximization algorithm in
-#' \insertCite{Ghachem2022;textual}{PINstimation}.
+#' \item \link{detectlayers_ecm} detects the number of information layers
+#' present in the trade-data using the expectation-conditional maximization
+#' algorithm in \insertCite{Ghachem2022;textual}{PINstimation}.
 #' \item \link{fact_adjpin} returns the `AdjPIN` factorization of the likelihood
 #' function by \insertCite{Ersan2022b;textual}{PINstimation} evaluated at the
 #' provided data and parameter sets.
@@ -150,9 +150,9 @@
 #' \item \link{initials_pin_yz} generates the initial parameter sets for the
 #' maximum likelihood estimation of the probability of informed trading (`PIN`)
 #' using the algorithm of \insertCite{Yan2012;textual}{PINstimation}.
-#' \item \link{mpin_ecm} estimates the multilayer probability of informed trading
-#' (`MPIN`) using the expectation-conditional maximization algorithm (`ECM`) as in
-#' \insertCite{Ghachem2022;textual}{PINstimation}.
+#' \item \link{mpin_ecm} estimates the multilayer probability of informed
+#' trading (`MPIN`) using the expectation-conditional maximization algorithm
+#' (`ECM`) as in \insertCite{Ghachem2022;textual}{PINstimation}.
 #' \item \link{mpin_ml} estimates the multilayer probability of informed trading
 #' (`MPIN`) using layer detection algorithms in
 #' \insertCite{Ersan2016;textual}{PINstimation}, and
@@ -160,6 +160,8 @@
 #' likelihood estimation.
 #' \item \link{pin} estimates the probability of informed trading (`PIN`) using
 #' custom initial parameter set(s) provided by the user.
+#' \item \link{pin_bayes} estimates the probability of informed trading (`PIN`) using
+#' the Bayesian approach in \insertCite{griffin2021;textual}{PINstimation}.
 #' \item \link{pin_ea} estimates the probability of informed trading (`PIN`)
 #' using the initial parameter sets from the algorithm of
 #' \insertCite{ErsanAlici2016;textual}{PINstimation}.
@@ -225,13 +227,16 @@
 #' @importFrom methods new show is
 #' @importFrom stats aggregate complete.cases quantile cutree dist ppois rpois
 #' weighted.mean qpois dpois hclust optim sd setNames runif na.omit qnorm pnorm
+#' rbeta rbinom rgamma rmultinom
 #' @importFrom utils head read.delim tail
 #' @importFrom Rdpack reprompt
 #' @importFrom skellam qskellam
 #' @importFrom furrr future_map
 #' @importFrom future plan multisession sequential
 #' @importFrom dplyr %>% summarize group_by
+#' @importFrom coda geweke.diag mcmc
 #' @import rmarkdown
+#'
 #'
 #' @name PINstimation-package
 NULL

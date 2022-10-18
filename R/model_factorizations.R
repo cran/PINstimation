@@ -10,7 +10,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-06-01
 ##
 ## License:
 ##    GPL 3
@@ -247,22 +247,8 @@ fact_pin_eho <- function(data, parameters = NULL) {
   environment(.xcheck$existence) <- environment()
   .xcheck$existence(allvars, err = uierrors$fact(model = "PIN")$fn)
 
-  # Check that all arguments are valid
-  # -------------------------------------------------------------------------
-  largs <- list(data, parameters)
-  names(largs) <- names(formals())
-  largs$fn <- "pin"
-  rst <- .xcheck$args(largs)
-  ux$stopnow(rst$off, m = rst$error, s = uierrors$fact(model = "PIN")$fn)
+  return(get_factorization(list(data, parameters), fact = "EHO"))
 
-  # Prepare 'data' and initialize variables
-  # --------------------------------------------------------------------------
-  data <- ux$prepare(data)
-  if (is.null(parameters)) {
-    return(factorizations$pin_eho(data))
-  } else {
-    return(-factorizations$pin_eho(data)(parameters))
-  }
 }
 
 #' @rdname factorizations
@@ -275,22 +261,8 @@ fact_pin_lk <- function(data, parameters = NULL) {
   environment(.xcheck$existence) <- environment()
   .xcheck$existence(allvars, err = uierrors$fact(model = "PIN")$fn)
 
-  # Check that all arguments are valid
-  # -------------------------------------------------------------------------
-  largs <- list(data, parameters)
-  names(largs) <- names(formals())
-  largs$fn <- "pin"
-  rst <- .xcheck$args(largs)
-  ux$stopnow(rst$off, m = rst$error, s = uierrors$fact(model = "PIN")$fn)
+  return(get_factorization(list(data, parameters), fact = "LK"))
 
-  # Prepare 'data' and initialize variables
-  # --------------------------------------------------------------------------
-  data <- ux$prepare(data)
-  if (is.null(parameters)) {
-    return(factorizations$pin_lk(data))
-  } else {
-    return(-factorizations$pin_lk(data)(parameters))
-  }
 }
 
 #' @rdname factorizations
@@ -303,24 +275,8 @@ fact_pin_e <- function(data, parameters = NULL) {
   environment(.xcheck$existence) <- environment()
   .xcheck$existence(allvars, err = uierrors$fact(model = "PIN")$fn)
 
-  # Check that all arguments are valid
-  # -------------------------------------------------------------------------
-  largs <- list(data, parameters)
-  names(largs) <- names(formals())
-  largs$fn <- "pin"
-  rst <- .xcheck$args(largs)
-  ux$stopnow(rst$off, m = rst$error, s = uierrors$fact(model = "PIN")$fn)
+  return(get_factorization(list(data, parameters), fact = "E"))
 
-  # Prepare 'data' and initialize variables
-  # --------------------------------------------------------------------------
-  data <- ux$prepare(data)
-
-
-  if (is.null(parameters)) {
-    return(factorizations$pin_e(data))
-  } else {
-    return(-factorizations$pin_e(data)(parameters))
-  }
 }
 
 
@@ -334,23 +290,8 @@ fact_mpin <- function(data, parameters = NULL) {
   environment(.xcheck$existence) <- environment()
   .xcheck$existence(allvars, err = uierrors$fact(model = "MPIN")$fn)
 
-  # Check that all arguments are valid
-  # -------------------------------------------------------------------------
-  largs <- list(data, parameters)
-  names(largs) <- names(formals())
-  largs$fn <- "mpin"
-  rst <- .xcheck$args(largs)
-  ux$stopnow(rst$off, m = rst$error, s = uierrors$fact(model = "MPIN")$fn)
+  return(get_factorization(list(data, parameters), fact = "MPIN"))
 
-  # Prepare 'data' and initialize variables
-  # --------------------------------------------------------------------------
-  data <- ux$prepare(data)
-
-  if (is.null(parameters)) {
-    return(factorizations$mpin(data))
-  } else {
-    return(-factorizations$mpin(data)(parameters))
-  }
 }
 
 #' @rdname factorizations
@@ -363,23 +304,8 @@ fact_adjpin <- function(data, parameters = NULL) {
   environment(.xcheck$existence) <- environment()
   .xcheck$existence(allvars, err = uierrors$fact(model = "AdjPIN")$fn)
 
-  # Check that all arguments are valid
-  # -------------------------------------------------------------------------
-  largs <- list(data, parameters)
-  names(largs) <- names(formals())
-  largs$fn <- "adjpindata"
-  rst <- .xcheck$args(largs)
-  ux$stopnow(rst$off, m = rst$error, s = uierrors$fact(model = "AdjPIN")$fn)
+  return(get_factorization(list(data, parameters), fact = "AdjPIN"))
 
-  # Prepare 'data' and initialize variables
-  # --------------------------------------------------------------------------
-  data <- ux$prepare(data)
-
-  if (is.null(parameters)) {
-    return(factorizations$adjpin(data))
-  } else {
-    return(-factorizations$adjpin(data)(parameters))
-  }
 }
 
 
@@ -388,9 +314,46 @@ fact_adjpin <- function(data, parameters = NULL) {
 ##       +++++++++++++++++++++++++
 
 
+
+
+get_factorization <- function(arglist, fact = NULL) {
+
+  # Recover the model from the factorization
+  # -------------------------------------------------------------------------
+  model <- fact
+  if (fact %in% c("E", "EHO", "LK")) model <- "PIN"
+
+  # Check that all arguments are valid
+  # -------------------------------------------------------------------------
+  largs <- setNames(arglist, c("data", "parameters"))
+  rst <- .xcheck$args(arglist = largs, fn = tolower(model))
+  ux$stopnow(rst$off, m = rst$error, s = uierrors$fact(model = model)$fn)
+
+  # Prepare 'data' and initialize variables
+  # --------------------------------------------------------------------------
+  data <- ux$prepare(largs$data)
+  parameters <- largs$parameters
+
+  factfunction <- switch(
+    EXPR = fact,
+    "EHO" = factorizations$pin_eho(data),
+    "LK" = factorizations$pin_lk(data),
+    "E" = factorizations$pin_e(data),
+    "MPIN" = factorizations$mpin(data),
+    "AdjPIN" = factorizations$adjpin(data)
+  )
+
+  if (!is.null(parameters)) factfunction <- - factfunction(parameters)
+
+  return(factfunction)
+
+}
+
+
 # -----------------------------------------------------------------------------#
 # PIN FACTORIZATIONS                                                           #
 # -----------------------------------------------------------------------------#
+
 
 factorizations <- list(
 

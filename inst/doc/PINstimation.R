@@ -59,7 +59,7 @@ adj.prob <- rbind(adjpin_ml@parameters[1:4], adjpin_ecm@parameters[1:4])
 rownames(adj.prob) <- c("ML", "ECM")
 
 ## ----Example.5.7, echo=F, eval=T----------------------------------------------
-cat("Probabilities of ML, and ECM estimations of the AdjPIN model\n")
+cat("Probability terms in ML and ECM estimations of the AdjPIN model\n")
 print(adj.prob)
 
 ## ----Example.5.8, results=F---------------------------------------------------

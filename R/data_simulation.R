@@ -11,7 +11,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-06-01
 ##
 ## License:
 ##    GPL 3
@@ -350,8 +350,7 @@ generatedata_mpin <- function(
   largs <- list(series, days, layers, parameters, ranges, 0, verbose)
   names(largs) <- names(formals())
   largs[["..."]] <- NULL
-  largs$fn <- "mpindata"
-  rst <- .xcheck$args(largs)
+  rst <- .xcheck$args(arglist = largs, fn = "mpindata")
   ux$stopnow(rst$off, m = rst$error, s = uierrors$mpindata()$fn)
 
   rst <- .xcheck$ranges(ranges, adj = FALSE)
@@ -400,8 +399,7 @@ generatedata_mpin <- function(
 
   time_on <- Sys.time()
   datalist <- list()
-  slayers <- c()
-  comments <- c()
+  slayers <- comments <- NULL
 
   # Display a generation message to users
   # --------------------------------------------------------------------------
@@ -625,15 +623,14 @@ generatedata_adjpin <- function(
   # -------------------------------------------------------------------------
   largs <- list(series, days, parameters, ranges, restricted, verbose)
   names(largs) <- names(formals())
-  largs$fn <- "adjpindata"
-  rst <- .xcheck$args(largs)
+  rst <- .xcheck$args(arglist = largs, fn = "adjpindata")
   ux$stopnow(rst$off, m = rst$error, s = uierrors$adjpindata()$fn)
 
-  restricted <- .xadjpin$allrestrictions(restricted)
-
   rst <- .xcheck$ranges(ranges, adj = TRUE)
-  ux$stopnow(rst$off, m = rst$error, s = uierrors$mpindata()$fn)
+  ux$stopnow(rst$off, m = rst$error, s = uierrors$adjpindata()$fn)
   ranges <- rst$ranges
+
+  restricted <- .xadjpin$allrestrictions(restricted)
 
   # If series == 1 return a 'dataset' object
   # --------------------------------------------------------------------------
@@ -833,7 +830,7 @@ generatedata_adjpin <- function(
                               trades[trades$badinfo == 1, ],
                               length, drop = FALSE)
     badinfo_days <- merge(badinfo_days, fullbox,
-                          by = c("lyr"), all = TRUE)[, 2]
+                          by = "lyr", all = TRUE)[, 2]
     badinfo_days[is.na(badinfo_days)] <- 0
 
   }
@@ -904,7 +901,7 @@ generatedata_adjpin <- function(
                     layers = layers,
                     theoreticals = theoreticals,
                     empiricals = empiricals,
-                    emp.pin = setNames(c(emp_mpin), c("MPIN")),
+                    emp.pin = setNames(emp_mpin, "MPIN"),
                     data = data, aggregates = aggregates,
                     likelihood = liklihood, warnings = conflicts,
                     runningtime = ux$timediff(time_on, time_off))
@@ -1363,7 +1360,7 @@ generatedata_adjpin <- function(
     if (thetas_nonzero & thetas_notone) {
 
       if (t_nonzero & t_notone) {
-        nshock <- (sum(tempclusters %in% c("C2")) > 0)
+        nshock <- (sum(tempclusters == "C2") > 0)
         if (!nshock) {
           tempclusters <- c("C2", tempclusters)
         }
@@ -1397,7 +1394,7 @@ generatedata_adjpin <- function(
     grouped_days <- aggregate(days ~ clusters, trades, length, drop = FALSE)
     alldays <- data.frame(clusters = c("C1", "C2", "C3", "C4", "C5",
                                        "C6"), days = 0)
-    grouped_days <- merge(grouped_days, alldays, by = c("clusters"),
+    grouped_days <- merge(grouped_days, alldays, by = "clusters",
                           all.y = TRUE)[, 1:2]
     grouped_days[is.na(grouped_days)] <- 0
     colnames(grouped_days) <- c("clusters", "days")
@@ -1574,7 +1571,7 @@ generatedata_adjpin <- function(
       }
 
       # Generate the mu's recursively
-      mu <- c()
+      mu <- NULL
       z <- 0
 
       for (k in 1:layers) {
@@ -1596,7 +1593,7 @@ generatedata_adjpin <- function(
       x <- qnorm((conf + 1) / 2)
       ub[1] <- x * sqrt(eb + es)
       lb[1] <- - x * sqrt(eb + es)
-      mu <- c(0)
+      mu <- 0
 
       for (k in 1:layers) {
 

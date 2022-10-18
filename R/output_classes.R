@@ -11,7 +11,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-06-18
 ##
 ## License:
 ##    GPL 3
@@ -133,14 +133,15 @@ setClass(
     factorization = "character", parameters = "numeric",
     likelihood = "numeric", pin.goodbad = "list", pin = "numeric",
     dataset = "data.frame", initialsets = "data.frame",
-    details = "data.frame", runningtime = "numeric"
+    details = "data.frame", method = "character",
+    runningtime = "numeric"
   ),
   prototype = list(
     success = TRUE, errorMessage = "", convergent.sets = 0,
     algorithm = "", factorization = "", parameters = 0,
     likelihood = 0, pin.goodbad = list(), pin = 0,
     dataset = data.frame(), initialsets = data.frame(),
-    details = data.frame(), runningtime = 0
+    details = data.frame(), method = "ML", runningtime = 0
   )
 )
 
@@ -159,12 +160,16 @@ setMethod(
     ux$show(m = interface$line)
     ux$show(m = interface$outcome)
     ux$show(m = interface$line)
+    ux$show(m = interface$method)
     ux$show(m = interface$algorithm)
     ux$show(m = interface$factorization)
     ux$show(m = interface$line)
     ux$show(m = interface$initialsets)
+    ux$show(c = (object@method == "BAYES"), m = interface$summary)
+    ux$show(c = (object@method == "BAYES"), m = interface$markov)
 
     if (object@success) {
+
       ux$show(nrow(object@initialsets) > object@convergent.sets,
                    m = interface$failedsets, warning = TRUE)
 
@@ -180,14 +185,21 @@ setMethod(
       rownames(results) <- NULL
       show(knitr::kable(results, "rst"))
 
+      if (object@method == "BAYES") {
+        maximizer <- which(object@details$likelihood == object@likelihood)
+        summary <- object@details$summary[[maximizer]]
+        show(knitr::kable(
+          summary, format = "simple",
+          caption = "Summary statistics for the Monte Carlo simulation"))
+
+      }
+
     } else {
 
       ux$show(m = interface$error, warning = TRUE)
-
     }
 
     ux$show(m = interface$runningtime)
-
   }
 )
 
@@ -487,9 +499,10 @@ setMethod(
 #' `'BIC'`, `'AIC'`, `'AWE'`; which stand for Bayesian Information Criterion,
 #' Akaike Information Criterion, and Approximate Weight of Evidence,
 #' respectively.
-#' @slot hyperparams (`list`) returns the hyperparameters of the `ECM` algorithm,
-#' which are `minalpha`, `maxeval`, `tolerance`, and `maxlayers`. Check the
-#' details section of \code{mpin_ecm()} to know more about these parameters.
+#' @slot hyperparams (`list`) returns the hyperparameters of the `ECM`
+#' algorithm, which are `minalpha`, `maxeval`, `tolerance`, and `maxlayers`.
+#' Check the details section of \code{mpin_ecm()} to know more about these
+#' parameters.
 #' @slot runningtime (`numeric`) returns the running time of the estimation
 #' in seconds.
 setClass(
@@ -590,7 +603,8 @@ setMethod(f = "selectModel", signature = "estimate.mpin.ecm",
 
 #' @rdname estimate.mpin.ecm-class
 #' @param object an object of class \code{estimate.mpin.ecm}.
-setGeneric(name = "getSummary", def = function(object) standardGeneric("getSummary"))
+setGeneric(name = "getSummary",
+           def = function(object) standardGeneric("getSummary"))
 
 
 
@@ -920,8 +934,8 @@ setMethod(
 #' in the estimation of AdjPIN model.
 #' @slot details (`dataframe`) returns a dataframe containing the estimated
 #' parameters for each initial parameter set.
-#' @slot hyperparams (`list`) returns the hyperparameters of the `ECM` algorithm,
-#' which are `maxeval`, and `tolerance`.
+#' @slot hyperparams (`list`) returns the hyperparameters of the `ECM`
+#' algorithm, which are `maxeval`, and `tolerance`.
 #' @slot runningtime (`numeric`) returns the running time of the `AdjPIN`
 #' estimation in seconds.
 #'

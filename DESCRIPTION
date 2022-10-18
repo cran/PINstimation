@@ -1,7 +1,7 @@
 Package: PINstimation
 Type: Package
-Version: 0.1.0
-Date: 2022-05-26
+Version: 0.1.1
+Date: 2022-10-18
 Title: Estimation of the Probability of Informed Trading
 Authors@R: 
     c(person("Montasser", "Ghachem",, "montasser.ghachem@pinstimation.com", role = c("aut", "cre","cph"), comment = c(ORCID = "0000-0001-6991-3316")),
@@ -18,14 +18,14 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 VignetteBuilder: knitr
 Imports: Rdpack, knitr, methods, skellam, nloptr, furrr, future, dplyr,
-        rmarkdown
+        rmarkdown, coda
 RdMacros: Rdpack
 Depends: R (>= 3.5.0)
 Language: en-US
 NeedsCompilation: no
-Packaged: 2022-05-26 17:52:44 UTC; ghmo8026
+Packaged: 2022-10-18 22:12:48 UTC; road_
 Repository: CRAN
-Date/Publication: 2022-05-27 08:30:02 UTC
+Date/Publication: 2022-10-18 22:58:01 UTC

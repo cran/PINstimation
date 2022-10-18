@@ -1,10 +1,9 @@
-# PINstimation <img src="man/figures/small_logo.png" align="right" />
+# PINstimation <img src="man/figures/small_logo.png" width="140" height="140" align="right" />
 
 [![R-CMD-check](https://github.com/monty-se/PINstimation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/monty-se/PINstimation/actions/workflows/R-CMD-check.yaml)
-[![Lint Code Base](https://github.com/monty-se/PINstimation/actions/workflows/super-linter.yml/badge.svg)](https://github.com/monty-se/PINstimation/actions/workflows/super-linter.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![GitHub R package version](https://img.shields.io/github/r-package/v/monty-se/pinstimation)
-[![SSRN - 4117946](https://img.shields.io/static/v1?label=SSRN&message=4117946&color=2ea44f)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4117946)
+![CRAN](https://www.r-pkg.org/badges/version-ago/PINstimation)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/PINstimation)](https://cranlogs.r-pkg.org/badges/grand-total/PINstimation)
 
 PINstimation provides utilities for the estimation of probability of informed trading models:
 original PIN (PIN) in Easley and O'Hara (1992) and Easley et al. (1996); multilayer
@@ -39,9 +38,10 @@ The functionalities that the package offers are summarized below:
 
 * **PIN model**
   * estimate the PIN model using the functions `pin()`, `pin_yz()`, `pin_gwj()`, and `pin_ea()`.
-  * compute initial parameter sets using the functions `initials_yz()`, `initials_gwj()`, and `initials_ea()`.
+  * compute initial parameter sets using the functions `initials_pin_yz()`, `initials_pin_gwj()`, and `initials_pin_ea()`.
   * generate simulation data following the PIN model using `generatedata_mpin(layers=1)`.
-  * evaluate factorizations of the PIN likelihood functions using `fact_eho()`, `fact_lk()`, `fact_e()`.
+  * evaluate factorizations of the PIN likelihood functions using `fact_pin_eho()`, `fact_pin_lk()`, `fact_pin_e()`.
+  * estimate the PIN model by **the Bayesian approach** (Gibbs Sampler) using `pin_bayes()` **(*)** .
 
 * **MPIN model**
   * estimate the MPIN model using the functions `mpin_ml()` and `mpin_ecm()`.
@@ -89,7 +89,7 @@ library(PINstimation)
 
 ### Example 1: Estimate the PIN model
 
-We estimate the PIN model on preloaded dataset `dailytrades` using the initial parameter sets of Ersan & Alici (2006).
+We estimate the PIN model on preloaded dataset `dailytrades` using the initial parameter sets of Ersan & Alici (2016).
 
 ```r
 estimate <- pin_ea(dailytrades)
@@ -314,7 +314,7 @@ in the field, namely `Tick`, `Quote`, `LR`, and `EMO`.
 
 ## Alternative packages
 
-To our knowledge, there are two preexisting R packages for the estimation of models of the probability of informed trading: [pinbasic](https://cran.r-project.org/package=pinbasic), and [InfoTrad](https://cran.r-project.org/package=InfoTrad).
+To our knowledge, there are three preexisting R packages for the estimation of models of the probability of informed trading: [pinbasic](https://cran.r-project.org/package=pinbasic), [InfoTrad](https://cran.r-project.org/package=InfoTrad), and [FinAsym](https://cran.r-project.org/package=FinAsym).
 
 ## Getting help
 

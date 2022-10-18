@@ -36,7 +36,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-10-18
 ##
 ## License:
 ##    GPL 3
@@ -100,8 +100,9 @@ uix <- list(
     ui$start <- "[+] MPIN estimation started"
     ui$complete <- "\n[+] MPIN estimation completed"
     ui$emcomplete <- "[+] MPIN estimation completed"
-    ui$detectsets <- paste("  |[1] Detecting layers from initialsets: ",
-                           initlayers, " information layer(s) detected", sep = "")
+    ui$detectsets <- paste(
+      "  |[1] Detecting layers from initialsets: ",
+      initlayers, " information layer(s) detected", sep = "")
     ui$detectdata <- "  |[1] Detecting layers from data \t:"
     ui$algorithm <- list(ECM = " using the ECM algorithm",
                          E = " using Ersan (2016)",
@@ -118,8 +119,9 @@ uix <- list(
       "using algorithm of Ersan (2016)")
     ui$expectedtime <- paste(
       "  |[3] Computing expected running time \t: ", exptime, sep = "")
-    ui$mlemethod <- paste("  |[3] Estimating the MPIN model \t:",
-                             " Maximum-likelihood standard estimation", sep = "")
+    ui$mlemethod <- paste(
+      "  |[3] Estimating the MPIN model \t:",
+      " Maximum-likelihood standard estimation", sep = "")
     ui$emmethod <- paste("  |[3] Estimating the MPIN model \t:",
       " Expectation-Conditional Maximization algorithm", sep = "")
     ui$differentlayers <- paste(
@@ -163,10 +165,12 @@ uix <- list(
     ui$computinginitials <-  paste(
       "\r  |[1] Computing initial parameter sets\t:", nrows,
       init, "initial sets generated")
-    ui$mlemethod <- paste("  |[2] Estimating the AdjPIN model \t:",
-                          " Maximum-likelihood Standard Estimation", sep = "")
-    ui$emmethod <- paste("  |[2] Estimating the AdjPIN model \t:",
-                         " Expectation-Conditional Maximization algorithm", sep = "")
+    ui$mlemethod <- paste(
+      "  |[2] Estimating the AdjPIN model \t:",
+      " Maximum-likelihood Standard Estimation", sep = "")
+    ui$emmethod <- paste(
+      "  |[2] Estimating the AdjPIN model \t:",
+      " Expectation-Conditional Maximization algorithm", sep = "")
     ui$progressbar <- " of AdjPIN estimation completed"
 
 
@@ -180,6 +184,8 @@ uix <- list(
     nrows, " ", type, " initial set(s) loaded", sep = "")
     ui$mlemethod <- paste("  |[3] Estimating PIN model (1996) \t:",
           "Using Maximum Likelihood Estimation")
+    ui$bayesmethod <- paste("  |[3] Estimating PIN model (1996) \t:",
+                          "Using Bayesian Gibbs Sampling")
     ui$complete <- "\n[+] PIN Estimation completed"
     ui$progressbar <- " of PIN estimation completed"
     title <- "  |[1] Likelihood function factorization:"
@@ -261,12 +267,13 @@ uierrors <- list(
       "\rparameter sets provided! Please review your initial parameter sets\n",
       "\rand try again!", sep = "")
     er$emfailed <- paste(
-      "The estimation using the Expectation-Conditional Maximization algorithm failed!",
+      "The estimation using the Expectation-Conditional Maximization",
+      " algorithm failed!",
       "\nThe ECM algorithm has failed to converge at the provided initial\n",
       "\rparameter sets! Please review your initial parameter sets\n",
       "\rand try again!", sep = "")
 
-    er$wronglength = paste(
+    er$wronglength <- paste(
       "\r[x] 'initialsets' must have a length 3J+2, for some integer",
       " J (number of layers):\n\r[-> You have supplied a dataframe ",
       "with ", cols, "variables.")
@@ -297,7 +304,6 @@ uierrors <- list(
         " sets.\n\rTo display them, either store them in a variable ",
         "or call", " (", fn, "). \n\rTo hide these messages, set the argument",
         " 'verbose' to FALSE.", sep = ""))
-
 
     return(er)
   },
@@ -350,7 +356,7 @@ uierrors <- list(
     er$unknown <- "An error occured during the AdjPIN data generation"
     er$notadataframe <- "The argument 'initialsets' should be a dataframe!"
     er$wrongdim <- paste(
-      "Wrong dimension of the argument 'params'.",
+      "Wrong dimension of the argument 'parameters'.",
       "It should contain 10 parameters!", sep = "")
     er$wrongvalues <- paste(
       "\rError: In the argument 'initialsets', either some probabilities ",
@@ -362,7 +368,8 @@ uierrors <- list(
       "\rparameter sets provided! Please review your initial parameter sets\n",
       "\rand try again!", sep = "")
     er$emfailed <- paste(
-      "The estimation using the Expectation-Conditional Maximization algorithm failed!",
+      "The estimation using the Expectation-Conditional Maximization",
+      "algorithm failed!",
       "\nThe ECM algorithm has failed to converge at the provided initial\n",
       "\rparameter sets! Please review your initial parameter sets\n",
       "\rand try again!", sep = "")
@@ -376,7 +383,7 @@ uierrors <- list(
     er$unknown <- "An error occured during the MPIN data generation"
     er$notadataframe <- "The argument 'initialsets' should be a dataframe!"
     er$wrongdim <- paste(
-      "Wrong dimension of the argument 'params'.",
+      "Wrong dimension of the argument 'parameters'.",
       "It should contain 10 parameters!", sep = "")
     er$esrange <-  "A range for eps.s should be provided  when eps_ratio = 0!"
     er$epsimpossible <- paste(
@@ -390,7 +397,8 @@ uierrors <- list(
       "\rparameter sets provided! Please review your initial parameter sets\n",
       "\rand try again!", sep = "")
     er$emfailed <- paste(
-      "The estimation using the Expectation-Conditional Maximization algorithm failed!",
+      "The estimation using the Expectation-Conditional Maximization",
+      "algorithm failed!",
       "\nThe ECM algorithm has failed to converge at the provided initial\n",
       "\rparameter sets! Please review your initial parameter sets\n",
       "\rand try again!", sep = "")
@@ -444,7 +452,10 @@ uierrors <- list(
     # 3 : rate range is not valid
     # 4 : Duplicated keys in list 'ranges'
     # 5 : Unrecognized keys in list 'ranges'
-    qvariable <- unname(sapply(var, sQuote, simplify = TRUE))
+
+    qvariable <- unname(vapply(
+      var, sQuote, FUN.VALUE = character(length(var))))
+
     var <- paste(var, collapse = ", ")
     interval <- ifelse(var == "alpha", "(0,1)", "[0,1]")
     qvariable <- paste(qvariable, collapse = ", ")
@@ -497,14 +508,16 @@ uierrors <- list(
     if (is.character(val)) val <- shQuote(val)
     val <- paste(val, collapse = ",")
     if (length(val) > 1) val <- paste("(", val, ")", sep = "")
-    varname <- paste(unname(sapply(keys[var], sQuote, simplify = TRUE)),
-                     collapse = ", ")
+    varname <- paste(unname(
+      vapply(keys[var], sQuote, FUN.VALUE = character(length(var)))),
+      collapse = ", ")
 
     errors <- list(
 
       paste("\r[x] Unrecognized elements in the argument '...':\n\r[-> ",
             "You have supplied value for unrecognized variable(s): ",
-            unname(sapply(var, sQuote, simplify = TRUE)), ".", sep = ""),
+            unname(vapply(var, sQuote, FUN.VALUE = character(1))), ".",
+            sep = ""),
 
       paste("\r[x] ", varname, " must be of type 'numeric':\n\r[-> ",
             "You have supplied the following value for ", varname, ": ",
@@ -598,11 +611,12 @@ uierrors <- list(
 
   layers = function(code, args = NULL) {
 
-    response = switch(
-      EXPR= code,
-      paste("\r[Warning]\nThe number of layers derived from 'parameters' is not",
-            " compatible with 'layers'.\nThe argument 'layers' will",
-            " be ignored", sep = ""),
+    response <- switch(
+      EXPR = code,
+      paste(
+        "\r[Warning]\nThe number of layers derived from 'parameters' is not",
+        " compatible with 'layers'.\nThe argument 'layers' will be ignored",
+        sep = ""),
       paste("\r[x] Impossible to generate ", args$layers, " layers:\n\r[-> ",
             "The value of 'layers' exceeds the number of days/observations (",
             args$days, ")!", sep = ""),
@@ -644,6 +658,7 @@ uierrors <- list(
   },
 
   arguments = function() {
+
     er <- list()
 
     er$initials <- function(error, class = NULL, cols = 0, rvars = 0,
@@ -757,7 +772,7 @@ uierrors <- list(
       xmessage <- switch(
         error,
         "wrongclass" = paste(
-          "\r[x] 'data' must be of class 'dataframe':\n\r[-> ",
+          "\r[x] 'data' must be of class 'dataframe', or 'matrix':\n\r[-> ",
           "You have supplied an argument of class '", class, "'.",
           sep = ""),
         "fewvariables" = paste(
@@ -775,12 +790,22 @@ uierrors <- list(
           "\n\r[-> The row number ", failure, " of the first column cannot be",
           " converted into a 'date' object.", sep = ""),
 
-        "wrongdatatypes" = paste(
-          "\r[x] The second, third, and fourth columns of 'data' must be ",
-          "integers:\n\r[-> You have supplied columns with types ", dtypes,
+        "wrongdatatypes_vpin" = paste(
+          "\r[x] The second, and third columns of 'data' must be ",
+          "numeric:\n\r[-> You have supplied columns with types ", dtypes,
           ".", sep = ""),
 
-        "wrongdatavalues" = paste(
+        "wrongdatatypes_agg" = paste(
+          "\r[x] The second, third, and fourth columns of 'data' must be ",
+          "numeric:\n\r[-> You have supplied columns with types ", dtypes,
+          ".", sep = ""),
+
+        "wrongdatavalues_vpin" = paste(
+          "\r[x] The second, and third columns of 'data' must be ",
+          "positive:\n\r[-> Some values of the second, or third ",
+          "columns are non-positive.", sep = ""),
+
+        "wrongdatavalues_agg" = paste(
           "\r[x] The second, third, and fourth columns of 'data' must be ",
           "positive:\n\r[-> Some values of the second, third, or fourth ",
           "columns are non positive.", sep = "")
@@ -794,30 +819,30 @@ uierrors <- list(
       xmessage <- switch(
         error,
         "wrongtype" = paste(
-          "\r[x] 'params' must be of type 'numeric':\n\r[-> ",
-          "The value of 'params' at positition ", ntype,
+          "\r[x] 'parameters' must be of type 'numeric':\n\r[-> ",
+          "The value of 'parameters' at positition ", ntype,
           " is of type '", ktype, "'.", sep = ""),
         "wrongdim" = paste(
-          "\r[x] 'params' must contain 10 values:\n\r[-> ",
+          "\r[x] 'parameters' must contain 10 values:\n\r[-> ",
           "You have supplied a numeric vector of size ", size, ".",
           sep = ""),
 
         "wrongalpha" = paste(
-          "\r[x] The first value of 'params' (alpha) is a probability and ",
+          "\r[x] The first value of 'parameters' (alpha) is a probability and ",
           "must belong to (0,1):\n\r[-> The first value of the provided ",
-          "'params' (", alpha, ") is ", ifelse(
+          "'parameters' (", alpha, ") is ", ifelse(
             alpha <= 0, "non-positive (<= 0)!", "larger than or equal to 1!"),
           sep = ""),
 
         "wrongprobabilities" = paste(
-          "\r[x] The first four values of 'params' (probabilities) must ",
-          "belong to [0,1]:\n\r[-> Some probabilities in 'params' are either",
+          "\r[x] The first four values of 'parameters' (probabilities) must ",
+          "belong to [0,1]:\n\r[-> Some probabilities in 'parameters' are either",
           " negative or larger than 1!", sep = ""),
 
         "wrongrates" = paste(
-          "\r[x] The last six values of 'params' (trading rates) must be",
-          " positive integers:\n\r[-> Some trading rates in 'params' are ",
-          "either negative or not integer-valued!", sep = ""),
+          "\r[x] The last six values of 'parameters' (trading rates) must be",
+          " positive:\n\r[-> Some trading rates in 'parameters' are ",
+          "negative or zero!", sep = ""),
 
 
 
@@ -830,8 +855,8 @@ uierrors <- list(
       xmessage <- switch(
         error,
         "wrongtype" = paste(
-          "\r[x] 'params' must be of type 'numeric':\n\r[-> ",
-          "The value of 'params' at positition ", ntype, " is of type '",
+          "\r[x] 'parameters' must be of type 'numeric':\n\r[-> ",
+          "The value of 'parameters' at positition ", ntype, " is of type '",
           ktype, "'.", sep = ""),
 
         "wrongdim" = paste(
@@ -840,34 +865,34 @@ uierrors <- list(
           " size ", size, ".", sep = ""),
 
         "incompatibledim" = paste(
-          "\r[x] 'parameters' must have a length of 3J+2, where J is the number",
-          " of layers:\n\r[-> You have supplied an argument 'layers' - ",
-          layers, " -, and the size of 'params' is ", size, ". \n\r[-> ",
-          "Remove one of the two arguments ('params' or 'layers'), and try",
+          "\r[x] 'parameters' must have a length of 3J+2, where J is the ",
+          "number of layers:\n\r[-> You have supplied an argument 'layers' - ",
+          layers, " -, and the size of 'parameters' is ", size, ". \n\r[-> ",
+          "Remove one of the two arguments ('parameters' or 'layers'), and try",
           " again!", sep = ""),
 
         "wrongalpha" = paste(
           "\r[x] The first", xlayers,
-          "value(s) of 'params' (alpha) must belong to (0,1):\n\r[-> The first",
-          xlayers, "value(s) of the provided 'params' lie outside (0,1)!",
+          "value(s) of 'parameters' (alpha) must belong to (0,1):\n\r[-> The first",
+          xlayers, "value(s) of the provided 'parameters' lie outside (0,1)!",
           sep = ""),
 
         "wrongprobabilities" = paste(
           "\r[x] The first ", ifelse(layers == 1, "two", 2 * layers),
-          " value(s) of 'params' (probabilities) must belong to [0,1]:\n\r[->",
-          " Some probabilities in 'params' are either negative or larger than",
+          " value(s) of 'parameters' (probabilities) must belong to [0,1]:\n\r[->",
+          " Some probabilities in 'parameters' are either negative or larger than",
           " 1!", sep = ""),
 
         "wrongrates" = paste(
-          "\r[x] The last ", layers + 2, " values of 'params' (trading rates)",
-          " must be positive integers:\n\r[-> Some trading rates in 'params' ",
-          "are either negative or not integer-valued!", sep = ""),
+          "\r[x] The last ", layers + 2, " values of 'parameters' (trading rates)",
+          " must be positive:\n\r[-> Some trading rates in 'parameters' ",
+          "are negative or zero!", sep = ""),
 
         "rankedmu" <- paste(
-          "\r[x] The values of 'params' in positions ", 2 * layers + 2, ":",
+          "\r[x] The values of 'parameters' in positions ", 2 * layers + 2, ":",
           3 * layers,
           " (informed trading rates muj) must be increasingly ranked:\n\r[-> ",
-          "The informed trading rates in 'params' (muj) are not increasingly ",
+          "The informed trading rates in 'parameters' (muj) are not increasingly ",
           "ranked!", sep = "")
 
 
@@ -877,7 +902,7 @@ uierrors <- list(
 
     er$restricted <- function(error, unknown = NULL, nonbinary = NULL) {
 
-      qvariable <- unname(sapply(unknown, sQuote, simplify = TRUE))
+      qvariable <- unname(vapply(unknown, sQuote, FUN.VALUE = character(1)))
       qvariable <- paste(qvariable, collapse = ", ")
 
       xmessage <- switch(
@@ -903,7 +928,7 @@ uierrors <- list(
       xmessage <- switch(
         error,
         "wrongclass" = paste(
-          "\r[x] 'data' must be of class 'dataframe':\n\r[-> ",
+          "\r[x] 'data' must be of class 'dataframe' or 'matrix':\n\r[-> ",
           "You have supplied an argument of class '", class, "'.",
           sep = ""),
         "fewvariables" = paste(
@@ -930,14 +955,13 @@ uierrors <- list(
     }
 
     er$unknown <- function(u) {
-      qvariable <- unname(sapply(u, sQuote, simplify = TRUE))
+      qvariable <- unname(vapply(u, sQuote, FUN.VALUE = character(1)))
       qvariable <- paste(qvariable, collapse = ", ")
       return(paste(
         "\r[x] Unrecognized elements in the function call:\n\r[-> ",
         "You have supplied values for unrecognized argument(s): ",
         qvariable, ".", sep = ""))
     }
-
 
     er$compatibility <- function(model, n, cl) {
       return(paste(
@@ -950,6 +974,15 @@ uierrors <- list(
           paste("The total number of clusters in initials_adjpin() is",
           "xtraclusters + 6 \n\r(", cl, ") should not exceed the total",
           "number of data observations (", n, ").", sep = ""))
+      ))
+    }
+
+    er$bayescompatibility <- function(sweeps, burnin) {
+      return(paste(
+        "\r[x] 'burnin' must take a valid value:\n\r[-> ",
+         paste("The value of 'burnin' (", burnin,
+               ") should be smaller than the number of sweeps (", sweeps, ").",
+               sep = "")
       ))
     }
 
@@ -967,7 +1000,7 @@ uierrors <- list(
 
 uiconflicts <- list(
 
-  add = function(conflicts, conflict, details = c()) {
+  add = function(conflicts, conflict, details = NULL) {
 
     conflict_msgs <- list(
       paste("[i] The eps_ratio condition is inactive. \neps.b and eps.s are",
@@ -1033,6 +1066,10 @@ uiclasses <- list(
 
     ui$factorization <- factorizations[[object@factorization]]
 
+    ui$method <- paste(
+      "Estimation method \t: ",
+      ifelse(object@method == "ML", "Maximum likelihood estimation",
+             "Bayesian Gibbs Sampling"), sep = "")
 
     ui$outcome <- if (object@success)
       "PIN estimation completed successfully" else
@@ -1041,6 +1078,15 @@ uiclasses <- list(
     ui$initialsets <- paste(
       nrow(object@initialsets), "initial set(s) are used in the estimation",
       "\nType object@initialsets to see the initial parameter sets used")
+
+    ui$summary <- paste("Type ", "object@details$summary[[j]]", " to see the ",
+                        "summary of Bayesian\nestimation using the j^th initial",
+                        "parameter set.", sep ="")
+
+    ui$markov <- paste("Type ", "object@details$markovmatrix[[j]]"," to see the ",
+                        "matrix of Monte \nCarlo simulation of the j^th iteration.",
+                       sep ="")
+
 
     ui$failedsets <- paste("[Warning] Estimation has failed for",
                            nrow(object@initialsets) - object@convergent.sets,
@@ -1483,7 +1529,7 @@ uiclasses <- list(
 
     ui$vpinfunctions <- paste(
       "Type object@vpin to access the VPIN vector.",
-      "\nType object@bucketdata to access data used to construct ",
+      "\nType object@bucketdata to access data used to construct",
       "the VPIN vector.",
       "\nType object@dailyvpin to access the daily VPIN vectors.")
 

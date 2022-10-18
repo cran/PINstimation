@@ -11,7 +11,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-06-18
 ##
 ## License:
 ##    GPL 3
@@ -178,8 +178,7 @@ aggregate_trades <- function(data, algorithm = "Tick", timelag = 0, ...,
   largs[["..."]] <- NULL
   largs$is_parallel <- is_parallel
   largs$reportdays <- reportdays
-  largs$fn <- "aggregation"
-  rst <- .xcheck$args(largs)
+  rst <- .xcheck$args(arglist = largs, fn = "aggregation")
   ux$stopnow(rst$off, m = rst$error, s = uierrors$aggregation()$fn)
 
 
@@ -187,6 +186,7 @@ aggregate_trades <- function(data, algorithm = "Tick", timelag = 0, ...,
   # --------------------------------------------------------------------------
   # We rename the first four columns to "timestamp", "price", "bid", "ask"
   is_posixct <- function(x) inherits(x, "POSIXct")
+  data <- as.data.frame(data[, 1:4])
   colnames(data) <- c("timestamp", "price", "bid", "ask")
 
   # We convert the columns price, bid and ask to numeric if they are not.
@@ -314,7 +314,7 @@ aggregate_trades <- function(data, algorithm = "Tick", timelag = 0, ...,
     tradeclass <- function(diffprice)
       return(switch(diffprice + 2, FALSE, NA, TRUE))
 
-    data$buy <- sapply(data$diffprice, tradeclass, simplify = TRUE)
+    data$buy <- vapply(data$diffprice, tradeclass, logical(1))
 
     return(invisible(data$buy))
   }
@@ -371,18 +371,18 @@ aggregate_trades <- function(data, algorithm = "Tick", timelag = 0, ...,
 
       if (is_parallel) {
 
-        future::plan(
-          multisession, gc = TRUE, workers = .default$parallel_cores())
+        oplan <- future::plan(multisession, gc = TRUE,
+                              workers = .default$parallel_cores())
+
+        on.exit(plan(oplan), add = TRUE)
 
         laggedindices <- furrr::future_map(xs, .get_lagged_value)
 
         laggedindices <- unlist(laggedindices)
 
-        future::plan(sequential)
-
       } else {
 
-        laggedindices <- sapply(xs, .get_lagged_value)
+        laggedindices <- vapply(xs, .get_lagged_value, double(1))
 
       }
 
@@ -427,8 +427,7 @@ aggregate_trades <- function(data, algorithm = "Tick", timelag = 0, ...,
       tradeclass <- function(diffprice)
         return(switch(diffprice + 2, FALSE, NA, TRUE))
 
-      data$quote <- sapply(sign(data$priceminusmidquote),
-                           tradeclass, simplify = TRUE)
+      data$quote <- lapply(sign(data$priceminusmidquote), tradeclass)
 
       # If the algorithm is quote, we stop here. If the algorithm is LR, then
       # there is an additional step

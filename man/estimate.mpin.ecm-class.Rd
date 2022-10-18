@@ -36,17 +36,17 @@ implemented in the function \code{mpin_ecm()}.
 }
 \section{Functions}{
 \itemize{
-\item \code{selectModel,estimate.mpin.ecm-method}: returns the optimal model among
+\item \code{selectModel(estimate.mpin.ecm)}: returns the optimal model among
 the estimated models, i.e., the model having the lowest information
 criterion, provided by the user.
 
-\item \code{getSummary,estimate.mpin.ecm-method}: returns a summary of
+\item \code{getSummary(estimate.mpin.ecm)}: returns a summary of
 the estimation of the \code{MPIN} model using the \code{ECM} algorithm for different
 values of the argument \code{layers}. For each estimation, the number of layers,
 the \code{MPIN} value, the log-likelihood value, as well as the values of the
 different information criteria, namely \code{AIC}, \code{BIC} and \code{AWE} are displayed.
-}}
 
+}}
 \section{Slots}{
 
 \describe{
@@ -131,9 +131,10 @@ find the optimal estimate for the \code{MPIN} model. It takes one of these value
 Akaike Information Criterion, and Approximate Weight of Evidence,
 respectively.}
 
-\item{\code{hyperparams}}{(\code{list}) returns the hyperparameters of the \code{ECM} algorithm,
-which are \code{minalpha}, \code{maxeval}, \code{tolerance}, and \code{maxlayers}. Check the
-details section of \code{mpin_ecm()} to know more about these parameters.}
+\item{\code{hyperparams}}{(\code{list}) returns the hyperparameters of the \code{ECM}
+algorithm, which are \code{minalpha}, \code{maxeval}, \code{tolerance}, and \code{maxlayers}.
+Check the details section of \code{mpin_ecm()} to know more about these
+parameters.}
 
 \item{\code{runningtime}}{(\code{numeric}) returns the running time of the estimation
 in seconds.}

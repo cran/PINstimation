@@ -17,7 +17,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-10-18
 ##
 ## License:
 ##    GPL 3
@@ -110,7 +110,8 @@
 
     if (length(temphps) > 0) {
 
-      is_numeric <- sapply(temphps, is.numeric)
+      is_numeric <- vapply(temphps, is.numeric, logical(1))
+
       if (prod(is_numeric) == 0) {
         # which key(s) is not numeric
 
@@ -217,7 +218,7 @@
         suppressWarnings(get0(d[i]))
         xlist <- list(off = FALSE, error = "")
       }, error = function(cond) {
-        msg <- unlist(strsplit(toString(cond), ": "))[[2]];
+        msg <- unlist(strsplit(toString(cond), ": "))[[2]]
         xlist <- list(off = TRUE, error = errors$notfound(d[i], msg))
         ux$stopnow(xlist$off, m = xlist$error, err)
       })
@@ -269,7 +270,7 @@
 
     # Check that all control variables are numeric (error code: 1)
     # -------------------------------------------------------------
-    is_numeric <- sapply(ranges, is.numeric)
+    is_numeric <- vapply(ranges, is.numeric, logical(1))
     if (prod(is_numeric) == 0) {
       # which key(s) is not numeric
       wkey <- which(is_numeric == FALSE)[1]
@@ -277,8 +278,7 @@
         var = names(ranges)[[wkey]], val = ranges[[wkey]], code = 1)))
     }
 
-
-    is_numeric <- prod(sapply(ranges, is.numeric))
+    is_numeric <- prod(vapply(ranges, is.numeric, logical(1)))
     if (!is_numeric) return(list(off = TRUE, error = uierrors$ranges(code = 1)))
 
     allerrors <- list()
@@ -429,10 +429,9 @@
     rkeys <- names(control)
     common <- length(intersect(rkeys, keys))
 
-
     # Check that all control variables are numeric
     # -------------------------------------------------------------
-    is_numeric <- sapply(control, is.numeric)
+    is_numeric <- vapply(control, is.numeric, logical(1))
     if (prod(is_numeric) == 0) {
       # which key(s) is not numeric
       wkey <- which(is_numeric == FALSE)[1]
@@ -592,9 +591,10 @@
 
   },
 
-  args = function(arglist) {
+  args = function(arglist, fn) {
 
     xnames <- names(arglist)
+    arglist$fn <- fn
 
     for (i in seq_len(length(xnames))) {
 
@@ -623,13 +623,14 @@
 
     if (vn %in% c(
       "tradinghours", "samplength", "buckets", "timebarsize", "num_init",
-      "xtraclusters", "layers", "grid_size", "series", "days", "timelag")
+      "xtraclusters", "layers", "grid_size", "series", "days", "timelag",
+      "sweeps", "prior.a", "prior.b")
     ) {
       gn <- "xinteger"
       vargs$range <- .default[[vn]]
     }
 
-    if (vn %in% c("confidence")) {
+    if (vn == "confidence") {
       gn <- "xnumeric"
       vargs$range <- .default[[vn]]
       vargs$strict <- TRUE
@@ -637,18 +638,16 @@
 
     if (vn %in% c(
       "fact", "verbose", "is_parallel", "correction", "ea_correction",
-      "reportdays")
-    ) gn <- "xlogical"
+      "reportdays")) gn <- "xlogical"
 
-    if (vn %in% c("algorithm", "method", "detectlayers", "factorization")
-    ) {
+    if (vn %in% c("algorithm", "method", "detectlayers", "factorization")) {
       gn <- "xcharacter"
       vargs$range <- .default[[vn]]
     }
 
     if (vn %in% c("ranges", "hyperparams")) gn <- "xlist"
 
-    if (vn %in% c("data", "initialsets", "restricted", "parameters")) {
+    if (vn %in% c("data", "initialsets", "restricted", "parameters", "burnin")) {
       gn <- vn
       vargs$al <- al
     }
@@ -760,9 +759,10 @@
     v <- vargs$al
     err <- vargs$errors
 
+
     if (v$fn == "aggregation" | v$fn == "vpin") {
 
-      if (!is.data.frame(v$data)) {
+      if (!is.data.frame(v$data) & !is.matrix(v$data)) {
         return(
           list(off = TRUE,
                error = err$hfdata(
@@ -798,8 +798,8 @@
       # Try to convert some values of the first column into a date variable
 
       .sample <- sample(seq_len(nrow(v$data)), min(nrow(v$data) / 10, 100))
-      convertible <- sapply(
-        v$data$timestamp[.sample], ux$is.convertible.to.date)
+      convertible <- vapply(
+        v$data[.sample, 1], ux$is.convertible.to.date, logical(1))
 
       if (!all(convertible)) {
         .failed <- which(convertible == FALSE)[[1]]
@@ -815,26 +815,32 @@
       # delete NA values from v$data
       v$data <- na.omit(v$data)
 
-      .types <- unlist(sapply(2:limit, function(x) is.numeric(v$data[, x])))
-      dtypes <- unlist(sapply(2:limit, function(x) typeof(v$data[, x])))
+      # set add-on error code based on the type of the call: "aggregation" or "vpin"
+      addon <- ifelse(v$fn == "aggregation", "agg", "vpin")
+
+      numbers_only <- function(x) suppressWarnings(all(!is.na(as.numeric(x)))) #sapply(x, function(y) !grepl("\\D", y)))
+
+      .types <- vapply(2:limit, function(x) numbers_only(v$data[, x]), logical(1))
+      dtypes <- vapply(2:limit, function(x) typeof(v$data[, x]), character(1))
 
       if (!all(.types)) {
         return(
           list(off = TRUE,
                error = err$hfdata(
-                 error = "wrongdatatypes",
+                 error = paste("wrongdatatypes_", addon, sep=""),
                  dtypes = dtypes)
           )
         )
 
       }
 
-      .negative <- any(v$data[, 2:limit] < 0, na.rm = TRUE)
+      colms <- apply(v$data[, 2:limit],2,as.numeric)
+      .negative <- any(colms < 0, na.rm = TRUE)
       if (.negative) {
         return(
           list(off = TRUE,
                error = err$hfdata(
-                 error = "wrongdatavalues")
+                 error = paste("wrongdatavalues_", addon, sep=""))
           )
         )
 
@@ -844,7 +850,7 @@
 
     } else {
 
-      if (!is.data.frame(v$data)) {
+      if (!is.data.frame(v$data) & !is.matrix(v$data)) {
         return(
           list(off = TRUE,
                error = err$tdata(
@@ -867,8 +873,8 @@
         )
       }
 
-      .types <- unlist(sapply(1:limit, function(x) is.numeric(v$data[, x])))
-      dtypes <- unlist(sapply(1:limit, function(x) typeof(v$data[, x])))
+      .types <- vapply(2:limit, function(x) is.numeric(v$data[, x]), logical(1))
+      dtypes <- vapply(2:limit, function(x) typeof(v$data[, x]), character(1))
 
       if (!all(.types)) {
         return(
@@ -918,7 +924,7 @@
     allnumeric <- prod(.types)
 
 
-    if (v$fn == "adjpindata") {
+    if (v$fn %in% c("adjpindata", "adjpin")) {
 
       if (allnumeric == 0)
         return(list(off = TRUE,
@@ -962,8 +968,7 @@
 
 
       invalidrates <- (
-        any(xparams[5:10] < 0) |
-          any(xparams[5:10] - floor(xparams[5:10]) != 0))
+        any(xparams[5:10] < 0))
 
       if (invalidrates) {
         return(list(off = TRUE,
@@ -1026,8 +1031,7 @@
 
       raterange <- (2 * xlayers + 1):(3 * xlayers + 2)
       invalidrates <- (
-        any(xparams[raterange] < 0) |
-          any(xparams[raterange] - floor(xparams[raterange]) != 0))
+        any(xparams[raterange] <= 0))
 
       if (invalidrates) return(list(off = TRUE, error = err$mpindata(
         error = "wrongrates", size = length(xparams), layers = xlayers)))
@@ -1066,7 +1070,7 @@
         unknown = unknown
       )))
 
-    binary <- sapply(v$restricted, is.logical)
+    binary <- vapply(v$restricted, is.logical, logical(1))
     allbinary <- prod(binary)
     if (!allbinary) {
       nonbinary <- rkeys[which(binary == FALSE)[[1]]]
@@ -1189,6 +1193,20 @@
       return(list(off = TRUE, error = err$list(varname, class(x))))
 
     return(list(off = FALSE, error = ""))
+
+  },
+
+  burnin = function(vargs) {
+
+    err <- uierrors$arguments()
+
+    # check that the value of burnin is smaller than 'sweeps'
+    valid <- (vargs$al$burnin < vargs$al$sweeps)
+
+    if (!valid)
+      return(list(off = TRUE, error = err$bayescompatibility(
+        sweeps = vargs$al$sweeps, burnin = vargs$al$burnin)))
+    return(list(off = FALSE, feedback = ""))
 
   }
 

@@ -169,8 +169,7 @@ initials_mpin <- function(data, layers = NULL, detectlayers = "EG",
   # -------------------------------------------------------------------------
   largs <- list(data, layers, detectlayers, xtraclusters, verbose)
   names(largs) <- names(formals())
-  largs$fn <- "mpin"
-  rst <- .xcheck$args(largs)
+  rst <- .xcheck$args(arglist = largs, fn = "mpin")
   ux$stopnow(rst$off, m = rst$error, s = uierrors$arguments()$mpininitfn)
 
 
@@ -179,7 +178,6 @@ initials_mpin <- function(data, layers = NULL, detectlayers = "EG",
   data <- ux$prepare(data)
   data$oi <- data$b - data$s
   data$aoi <- abs(data$b - data$s)
-  initials <- NULL
 
   # Get the number of layers if not provided
   # --------------------------------------------------------------------------
@@ -494,7 +492,7 @@ mpin_ml <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
 
   vargs <- list(...)
   # check for unknown keys in the argument "..."
-  unknown <- setdiff(names(vargs), c("is_parallel"))
+  unknown <- setdiff(names(vargs), "is_parallel")
   ux$stopnow(length(unknown) > 0, s = uierrors$mpin()$fn,
              m = uierrors$arguments()$unknown(u = unknown))
 
@@ -502,8 +500,7 @@ mpin_ml <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
   if (length(vargs) > 0 && "is_parallel" %in% names(vargs))
     is_parallel <- vargs$is_parallel
   largs$is_parallel <- is_parallel
-  largs$fn <- "mpin"
-  rst <- .xcheck$args(largs)
+  rst <- .xcheck$args(arglist = largs, fn = "mpin")
   ux$stopnow(rst$off, m = rst$error, s = uierrors$mpin()$fn)
 
 
@@ -608,8 +605,9 @@ mpin_ml <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
 #' @title Posterior probabilities for PIN and MPIN estimates
 #'
 #' @description Computes, for each day in the sample, the posterior probability
-#' that the day is a no-information day, good-information day and bad-information
-#' day, respectively (\insertCite{Easley1992;textual}{PINstimation},
+#' that the day is a no-information day, good-information day and
+#' bad-information day, respectively
+#' (\insertCite{Easley1992;textual}{PINstimation},
 #' \insertCite{Easley1996;textual}{PINstimation},
 #' \insertCite{Ersan2016;textual}{PINstimation}).
 #'
@@ -854,8 +852,8 @@ get_posteriors <- function(object) {
 
       # The vector thisrun contains all optimal parameters, alongside the
       # list 'estimates' containing the results of the ML estimation.
-      thisrun <- c(list(c(temp_run, estimates$par, -estimates$value,
-                   .xmpin$compute_pin(estimates$par)), I(list(estimates))))
+      thisrun <- c(list(c(temp_run, estimates[["par"]], -estimates$value,
+                   .xmpin$compute_pin(estimates[["par"]])), I(list(estimates))))
     }
 
     # Update the progress bar in the parent environment
@@ -881,11 +879,12 @@ get_posteriors <- function(object) {
 
   if (is_parallel & length(initialsets) >= .default$parallel_cap()) {
 
-    future::plan(multisession, gc = TRUE, workers = .default$parallel_cores())
+    oplan <- future::plan(multisession, gc = TRUE,
+                          workers = .default$parallel_cores())
+
+    on.exit(plan(oplan), add = TRUE)
 
     runs <- furrr::future_map(xs, function(x) .get_mlrun(x))
-
-    future::plan(sequential)
 
   } else {
 
@@ -937,7 +936,7 @@ get_posteriors <- function(object) {
     variables <- .xmpin$varnames()
 
     estimation <- split(
-      optimal$par, rep(1:5, c(layers, layers, layers, 1, 1)))
+      optimal[["par"]], rep(1:5, c(layers, layers, layers, 1, 1)))
 
     for (i in 1:5) assign(variables[i], estimation[[i]])
 

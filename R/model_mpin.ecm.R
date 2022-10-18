@@ -11,7 +11,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-06-01
 ##
 ## License:
 ##    GPL 3
@@ -325,9 +325,8 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
     is_parallel <- vargs$is_parallel
   largs$is_parallel <- is_parallel
   largs$hyperparams <- hyperparams
-  largs$fn <- "mpin"
 
-  rst <- .xcheck$args(largs)
+  rst <- .xcheck$args(arglist = largs, fn = "mpin")
   ux$stopnow(rst$off, m = rst$error, s = uierrors$mpin()$fn)
 
   rst <- .xcheck$hyperparams(hyperparams, nrow(data))
@@ -476,7 +475,7 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
       # list 'estimates' containing the results of the ECM estimation.
       thisrun <- c(
         list(c(temp_run, estimates$layers, mpin_params, estimates$likelihood,
-               .xmpin$compute_pin(estimates$par), estimates$xtime,
+               .xmpin$compute_pin(estimates$parameters), estimates$xtime,
                estimates$iterations)), I(list(estimates)))
     } else {
 
@@ -511,11 +510,12 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
 
   if (is_parallel & length(params) >= .default$parallel_cap()) {
 
-    future::plan(multisession, gc = TRUE, workers = .default$parallel_cores())
+    oplan <- future::plan(multisession, gc = TRUE,
+                          workers = .default$parallel_cores())
+
+    on.exit(plan(oplan), add = TRUE)
 
     runs <- furrr::future_map(xs, function(x) .get_run(x))
-
-    future::plan(sequential)
 
   } else {
 
@@ -659,8 +659,9 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
           initialsets <- initialsets[1:maxinit]
     }
 
-    # Perturb the values of delta if they are 0 or 1, set them to a small number
-    # so that the ECM algorithm is able to update the value away from zero or one
+    # Perturb the values of delta if they are 0 or 1, set them to a small
+    # number so that the ECM algorithm is able to update the value away
+    # from zero or one
     nu <- 10^-4
     initialsets <- lapply(initialsets,
                           function(x) x + (x == 0) * nu -  (x == 1) * nu)
@@ -668,7 +669,8 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
   }
 
   # Find initial sets for each configuration of layers and use .estimate_ecm
-  # to estime ECM and get the optimal results to be returned to mpin_ecm function.
+  # to estime ECM and get the optimal results to be returned to mpin_ecm
+  # function.
   # ----------------------------------------------------------------------------
   if (!is.null(initialsets) | !is.null(layers)) {
 
@@ -894,8 +896,9 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
   # loglik, which will store the log likelihood value in each iteration.
   # ---------------------------------------------------------------------------
   loglikhood <- function(z, p, eb, es, lambda, b, s) {
-    logdensity <- sapply(1:cls, .xmpin$logpmf, eb = eb, es = es,
-                         lambda = lambda, b, s, simplify = TRUE)
+    logdensity <- vapply(1:cls, .xmpin$logpmf, eb = eb, es = es,
+                         lambda = lambda, b, s,
+                         FUN.VALUE = double(length(b)))
 
     logdensity[is.na(logdensity)] <- 0
     return(ux$finite_sum(z * log(p)) + ux$finite_sum(z * logdensity))
@@ -912,7 +915,7 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
          iteration <= maxeval) {
 
     # ----------------------------------------------------------------------- #
-    #                             EXPECTATION STEP
+    #                             EXPECTATION STEP                            #
     # ----------------------------------------------------------------------- #
 
     estimateQ <- function(eb, es, muj, distribution, mergelayers = TRUE) {
@@ -923,8 +926,9 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
       # the process is aborted. The days having a posterior probability of zero,
       # get the posterior probability of an average day across all observations.
       # ------------------------------------------------------------------------
-      posterior_mx <- sapply(1:cls, .xmpin$posterior, p = distribution, eb,
-                             es, muj, data$b, data$s, simplify = TRUE)
+      posterior_mx <- vapply(1:cls, .xmpin$posterior, p = distribution, eb,
+                             es, muj, data$b, data$s,
+                             FUN.VALUE = double(length(data$b)))
       posterior_mx[is.na(posterior_mx)] <- 0
 
       if (sum(posterior_mx) == 0) return(list(interrupted = T))
@@ -955,12 +959,12 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
       if (mergelayers) {
 
         dx <- distribution
-        alpha <- dx[2:(layers+1)] + dx[(layers+2):(2*layers+1)]
+        alpha <- dx[2:(layers + 1)] + dx[(layers + 2):(2 * layers + 1)]
         todrop <- which(alpha < minalpha)
 
         # Drop the information layers whose alpha is too small (<minalpha)
         # ----------------------------------------------------------------------
-        if(length(todrop) > 0){
+        if (length(todrop) > 0) {
 
           dropped <- .xmpin$drop_layers(distribution, todrop, muj)
 
@@ -1425,7 +1429,8 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
     # ------------------------------------------------------------------------
     allmu <- c(max(eb, es), max(eb, es) + muj)
 
-    lbmu <- sapply(allmu[2:(layers + 1)], function(x) qpois(0.05, x))
+    lbmu <- vapply(allmu[2:(layers + 1)], function(x) qpois(0.05, x),
+                   FUN.VALUE = double(1))
     ubmu <- allmu[1:layers]
 
     tomerge <- (ubmu > lbmu)
@@ -1442,9 +1447,9 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
       # ----------------------------------------------------------------------
       if (receiver == 1) {
 
-        xmuj <- muj[-c(1)]
-        dglayers <- dglayers[-c(1)]
-        dblayers <- dblayers[-c(1)]
+        xmuj <- muj[-1]
+        dglayers <- dglayers[-1]
+        dblayers <- dblayers[-1]
         layers_to_lose <- 1
 
       } else {

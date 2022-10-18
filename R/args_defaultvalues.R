@@ -12,7 +12,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-05-26
+##    2022-06-18
 ##
 ## License:
 ##    GPL 3
@@ -144,6 +144,14 @@
 
   samplength = c(1, +Inf),
 
+  sweeps = c(1, 10^8),
+
+  burnin = c(1, 10^8),
+
+  prior.a = c(1, 10^8),
+
+  prior.b = c(1, 10^8),
+
   xtraclusters = c(0, ifelse(!is.null(getOption("numberoftradingdays")) &&
                                        getOption("numberoftradingdays") > 0,
                              getOption("numberoftradingdays"), +Inf)),
@@ -162,7 +170,7 @@
 
   series = c(1, 10^8),
 
-  days = c(1, 10^8),
+  days = c(10, 10^8),
 
   algorithm =  c("TICK", "QUOTE", "LR", "EMO"),
 
