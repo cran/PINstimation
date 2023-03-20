@@ -1,4 +1,4 @@
-# PINstimation <img src="man/figures/small_logo.png" width="140" height="140" align="right" />
+# PINstimation: Estimating Models of Probability of Informed Trading <img src="man/figures/small_logo.png" width="140" height="140" align="right" />
 
 [![R-CMD-check](https://github.com/monty-se/PINstimation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/monty-se/PINstimation/actions/workflows/R-CMD-check.yaml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -14,6 +14,19 @@ are among the supplementary utilities. The package enables fast and precise solu
 for the sophisticated, error-prone and time-consuming estimation procedure of the probability
 of informed trading measures, and it is compact in the sense detailed estimation results
 can be achieved by solely the use of raw trade level data.
+
+## New features in Version 0.1.2
+
+* We introduce a new function called `classify_trades()` that enables users to
+classify high-frequency (HF) trades individually, without aggregating them.  
+For each HF trade, the function assigns a variable `isBuy` that is set to `TRUE`
+if the trade is buyer-initiated, or `FALSE` if it is seller-initiated.
+
+* The `aggregate_trades()` function enables users to aggregate high-frequency
+(HF) trades at different frequencies. In the previous version, HF trades were 
+automatically aggregated into daily trade data. However, with the updated 
+version, users can now specify the desired frequency, such as every 15 minutes.
+
 
 ## Table of contents
 <!--ts-->

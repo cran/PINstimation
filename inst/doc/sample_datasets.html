@@ -11,7 +11,7 @@
 
 
 
-<title>Get started</title>
+<title>Sample datasets</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1619,7 +1619,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Get started</h1>
+<h1 class="title toc-ignore">Sample datasets</h1>
 
 </div>
 
@@ -1627,304 +1627,355 @@ display: none;
 <div id="overview" class="section level2">
 <h2>Overview</h2>
 <hr />
-<p>This vignette describes how to install the package ‘PINstimation’,
-either in its stable version on CRAN, or in its development version of
-Github. It also provides several usage examples on how to use the
-different functionalities of the package.</p>
+<p>This vignette describes various scenarios of creating sample datasets
+that fit the preferences and needs of the users; and this for the
+different models. The functions in the package PINstimation use two
+types of datasets: (1) A sequence of daily buys and sells (2) A
+high-frequency trading data. This is the reason why only two sample
+datasets are preloaded with the package, namely
+<code>dailytrades</code>, and <code>hfdata</code>. The users can also
+generate simulation data using the function
+<code>generatedata_mpin()</code> for PIN, and MPIN models; and the
+function <code>generatedata_adjpin()</code> for the ADJPIN model. Below
+we provide some scenarios of creating sample datasets both for the PIN,
+MPIN, and ADJPIN models.</p>
 </div>
-<div id="installation" class="section level2">
-<h2>Installation</h2>
+<div id="sample-datasets-for-the-pin-model" class="section level2">
+<h2>Sample datasets for the PIN model</h2>
 <hr />
-<p>The easiest way to get PINstimation is the following:</p>
-<pre class="r"><code>install.packages(&quot;PINstimation&quot;)</code></pre>
-<p>To get a bug fix or to use a feature from the development version,
-you can install the development version of PINstimation from GitHub.</p>
-<pre class="r"><code># install.packages(&quot;devtools&quot;)
-# library(devtools)
-devtools::install_github(&quot;monty-se/PINstimation&quot;, build_vignettes = TRUE)</code></pre>
-<p>Loading the package</p>
-<pre class="r"><code>library(PINstimation)</code></pre>
-</div>
-<div id="note-to-frequent-users" class="section level2">
-<h2>Note to frequent users</h2>
-<hr />
-<p>If you are a frequent user of PINstimation, you might want to avoid
-repetitively loading the package PINstimation whenever you open a new R
-session. You can do that by adding PINstimation to
-<code>.R profile</code> either manually, or using the function
-<code>load_pinstimation_for_good()</code>.</p>
-<p>To automatically load PINstimation, run
-<code>load_pinstimation_for_good()</code>, and the following code will
-be added to your .R profile.</p>
-<pre class="r"><code>if (interactive()) suppressMessages(require(PINstimation))</code></pre>
-<p>After restart of the R session, PINstimation will be loaded
-automatically, whenever a new R session is started. To remove the
-automatic loading of PINstimation, just open the .R profile for editing
-<code>usethis::edit_r_profile()</code>, find the code above, and delete
-it.</p>
-</div>
-<div id="usage-examples" class="section level2">
-<h2>Usage examples</h2>
-<hr />
-<p>Below, you find five usage examples for the main functions in the
-package.</p>
-<ul>
-<li><p><strong>Example 1</strong>: [PIN] Use daily trade data to
-estimate the standard probability of informed trading.</p></li>
-<li><p><strong>Example 2</strong>: [MPIN] Use daily trade data to
-estimate the number of layers in the data, as well as the multi-layer
-probability of informed trading.</p></li>
-<li><p><strong>Example 3</strong>: [AdjPIN] Use daily trade data to
-estimate the adjusted probability of informed trading.</p></li>
-<li><p><strong>Example 4</strong>: [VPIN] Use high-frequency data to
-estimate the volume-adjusted probability of informed trading.</p></li>
-<li><p><strong>Example 5</strong>: Classify high frequency trades into
-daily trading data, and use it to estimate the adjusted probability of
-informed trading using the Maximum-likelihood method, and the
-Expectation-Maximization algorithm.</p></li>
-</ul>
-<div id="example-1-estimate-the-pin-model" class="section level3">
-<h3>Example 1: Estimate the PIN model</h3>
-<hr />
-<p>We estimate the PIN model on preloaded dataset
-<code>dailytrades</code> using the initial parameter sets of Ersan &amp;
-Alici (2016).</p>
-<pre class="r"><code>estimate &lt;- pin_ea(dailytrades)</code></pre>
-<pre><code>## [+] PIN Estimation started 
-##   |[1] Likelihood function factorization: Ersan (2016)
-##   |[2] Loading initial parameter sets   : 5 EA initial set(s) loaded
-##   |[3] Estimating PIN model (1996)      : Using Maximum Likelihood Estimation
-##   |+++++++++++++++++++++++++++++++++++++| 100% of PIN estimation completed
-## [+] PIN Estimation completed</code></pre>
-<pre class="r"><code>show(estimate)</code></pre>
-<pre><code>## ----------------------------------
-## PIN estimation completed successfully
+<p>The PIN model is an multilayer PIN model with a single information
+layer. We can, therefore, use the function
+<code>generatedata_mpin()</code>, in order to generate sample data for
+the PIN model. Generically, this is done as follows:</p>
+<pre class="r"><code>generatedata_mpin(..., layers=1)</code></pre>
+<p>If the user would like to create a sample dataset for infrequently
+traded stock, she can specify low values or ranges for the trade
+intensity rates. For instance, let’s assume that the user suspects that
+an infrequently-traded stock has an average of uninformed trading
+intensity for buys and sells between <code>300</code> and
+<code>500</code>. They generate a single sample dataset for this
+scenario as follows:</p>
+<pre class="r"><code>pindata &lt;- generatedata_mpin(layers=1, ranges = list(eps.b=c(300, 500), eps.s=c(300,500)), verbose = FALSE)</code></pre>
+<p>The details of the generated sample dataset can be displayed with the
+following code</p>
+<pre class="r"><code>show(pindata)</code></pre>
+<pre class="r-output"><code>## ----------------------------------
+## Data series successfully generated
 ## ----------------------------------
-## Estimation method    : Maximum likelihood estimation
-## Initial parameter sets   : Ersan and Alici (2016)
-## Likelihood factorization: Ersan (2016)
+## Simulation model     : MPIN model
+## Number of layers : 1 layer(s)
+## Number of trading days   : 60 days
 ## ----------------------------------
-## 5 initial set(s) are used in the estimation 
-## Type object@initialsets to see the initial parameter sets used
+## Type object@data to get the simulated data
 ## 
-## [0;37;41m PIN model [0m 
+## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span> 
 ## 
-## ==========  ===========
-## Variables   Estimates  
-## ==========  ===========
-## alpha       0.749997   
-## delta       0.133334   
-## mu          1193.52    
-## eps.b       357.27     
-## eps.s       328.63     
-## ----                   
-## Likelihood  (3226.469) 
-## PIN         0.566172   
-## ==========  ===========
+## ===========  ==============  ============  =============
+## Variables    Theoretical.    Empirical.    Aggregates.  
+## ===========  ==============  ============  =============
+## alpha        0.462853        0.4           0.4          
+## delta        0.635296        0.625         0.625        
+## mu           259             260.27        260.27       
+## eps.b        465             464.98        464.98       
+## eps.s        413             417.64        417.64       
+## ----                                                    
+## Likelihood   -               (602.573)     (602.573)    
+## mpin         -               0.105508      0.105508     
+## ===========  ==============  ============  =============
 ## 
 ## -------
-## Running time: 0.683 seconds</code></pre>
+## Running time: 0.009 seconds
+</code></pre>
+<p>You access the sequences of buys, and sells through the slot
+<code>@data</code> of the object <code>pindata</code>.</p>
+<pre class="r"><code>show(pindata@data[1:10, ])</code></pre>
+<pre class="r-output"><code>##      b   s
+## 1  495 429
+## 2  455 424
+## 3  494 673
+## 4  471 713
+## 5  493 630
+## 6  742 396
+## 7  493 451
+## 8  482 630
+## 9  484 397
+## 10 444 435
+</code></pre>
+<p>You can, now use the dataset object <code>pindata</code> to check the
+accuracy of the different estimation functions. You can do that by
+comparing the actual parameters of the sample datasets to the estimated
+parameters of the estimation functions. Let us start with displaying the
+actual parameters of the sample datasets. These can be accessed through
+the slot <code>@empiricals</code> of the dataset object, which stores
+the empirical parameters computed from the sequences of buys and sells
+generated. Please refer to the documentation of
+<code>generatedata_mpin()</code> for more information.</p>
+<pre class="r"><code>actual &lt;- unlist(pindata@empiricals)
+show(actual)</code></pre>
+<pre class="r-output"><code>##    alpha    delta       mu    eps.b    eps.s 
+##   0.4000   0.6250 260.2712 464.9804 417.6444
+</code></pre>
+<p>Estimate the PIN model using the function <code>pin_ea()</code>, and
+display the estimated parameters</p>
+<pre class="r"><code>model &lt;- pin_ea(data=pindata@data, verbose = FALSE)
+estimates &lt;- model@parameters 
+show(estimates)</code></pre>
+<pre class="r-output"><code>##       alpha       delta          mu       eps.b       eps.s 
+##   0.3999997   0.6250055 260.2848636 465.3148049 417.3043139
+</code></pre>
+<p>Now calculate the absolute errors of the estimation method.</p>
+<pre class="r"><code>errors &lt;- abs(actual - estimates)
+show(errors)</code></pre>
+<pre class="r-output"><code>##        alpha        delta           mu        eps.b        eps.s 
+## 2.803387e-07 5.455089e-06 1.362178e-02 3.344128e-01 3.401306e-01
+</code></pre>
 </div>
-<div id="example-2-estimate-the-multilayer-pin-model" class="section level3">
-<h3>Example 2: Estimate the Multilayer PIN model</h3>
+<div id="sample-datasets-for-the-mpin-model" class="section level2">
+<h2>Sample datasets for the MPIN model</h2>
 <hr />
-<p>We run the estimation of the MPIN model on preloaded dataset
-<code>dailytrades</code> using:</p>
-<ul>
-<li>the maximum-likelihood method.</li>
-</ul>
-<pre class="r"><code>ml_estimate &lt;- mpin_ml(dailytrades)</code></pre>
-<pre><code>## [+] MPIN estimation started
-##   |[1] Detecting layers from data       : using Ersan and Ghachem (2022a)
-##   |[=] Number of layers in the data     : 3 information layer(s) detected
-##   |[2] Computing initial parameter sets : using algorithm of Ersan (2016)
-##   |[3] Estimating the MPIN model        : Maximum-likelihood standard estimation
-##   |+++++++++++++++++++++++++++++++++++++| 100% of mpin estimation completed
-## [+] MPIN estimation completed</code></pre>
-<ul>
-<li>the ECM algorithm.</li>
-</ul>
-<pre class="r"><code>ecm_estimate &lt;- mpin_ecm(dailytrades)</code></pre>
-<pre><code>## [+] MPIN estimation started
-##   |[1] Computing the range of layers    : information layers from 1 to 8
-##   |[2] Computing initial parameter sets : using algorithm of Ersan (2016)
-##   |[=] Selecting initial parameter sets : max 100 initial sets per estimation
-##   |[3] Estimating the MPIN model        : Expectation-Conditional Maximization algorithm
-##   |+++++++++++++++++++++++++++++++++++++| 100% of estimation completed [8 layer(s)]
-##   |[3] Selecting the optimal model      : using lowest Information Criterion (BIC)
-## [+] MPIN estimation completed</code></pre>
-<p>Compare the aggregate parameters obtained from the ML, and ECM
-estimations.</p>
-<pre class="r"><code>mpin_comparison &lt;- rbind(ml_estimate@aggregates, ecm_estimate@aggregates)
-rownames(mpin_comparison) &lt;- c(&quot;ML&quot;, &quot;ECM&quot;)</code></pre>
-<pre><code>## Probabilities of ML, and ECM estimations of the MPIN model</code></pre>
-<pre><code>##        alpha     delta       mu    eps.b    eps.s
-## ML  0.750004 0.1333320 1210.984 336.9118 335.8871
-## ECM 0.750000 0.1333333 1211.001 336.9051 335.8866</code></pre>
-<p>Display the summary of the model estimates for all number of
-layers.</p>
-<pre class="r"><code>summary &lt;- getSummary(ecm_estimate)</code></pre>
-<pre><code>##          layers em.layers  MPIN Likelihood    AIC    BIC    AWE
-## Model[1]      1         1 0.566  -3226.469 6462.9 6473.4 6508.9
-## Model[2]      2         2 0.577   -800.379 1616.8 1633.5 1690.3
-## Model[3]      3         3 0.574   -643.458 1308.9 1332.0 1410.0
-## Model[4]      4         3 0.574   -643.458 1308.9 1332.0 1410.0
-## Model[5]      5         3 0.574   -643.458 1308.9 1332.0 1410.0
-## Model[6]      6         3 0.574   -643.458 1308.9 1332.0 1410.0
-## Model[7]      7         4 0.575   -642.631 1313.3 1342.6 1441.9
-## Model[8]      8         4 0.575   -642.631 1313.3 1342.6 1441.9</code></pre>
-</div>
-<div id="example-3-estimate-the-adjusted-pin-model" class="section level3">
-<h3>Example 3: Estimate the Adjusted PIN model</h3>
-<hr />
-<p>We estimate the adjusted PIN model on preloaded dataset
-<code>dailytrades</code> using <code>20</code> initial parameter sets
-computed by the algorithm of Ersan and Ghachem (2022b).</p>
-<pre class="r"><code>estimate_adjpin &lt;- adjpin(dailytrades, initialsets = &quot;GE&quot;)</code></pre>
-<pre><code>## [+] AdjPIN estimation started
-##   |[1] Computing initial parameter sets : 20 GE initial sets generated
-##   |[2] Estimating the AdjPIN model      : Expectation-Conditional Maximization algorithm
-##   |+++++++++++++++++++++++++++++++++++++| 100% of AdjPIN estimation completed
-## [+] AdjPIN estimation completed</code></pre>
-<pre class="r"><code>show(estimate_adjpin)</code></pre>
-<pre><code>## ----------------------------------
-## AdjPIN estimation completed successfully
+<p>In contrast to the PIN model, the number of information layers is
+free. We can, therefore, use the function
+<code>generatedata_mpin()</code> with the desired number of information
+layers, in order to generate sample data for the MPIN model. We can also
+skip specifying the number of layers, and the default setting will be
+used: the number of layers will be randomly selected from the integer
+set from <code>1</code> to <code>5</code>. Generically, this is done as
+follows:</p>
+<pre class="r"><code>generatedata_mpin(...)</code></pre>
+<p>If the user would like to create a sample dataset for frequently
+traded stock with two information layers, she can set the argument
+layers to 2, and specify high values or ranges for the trade intensity
+rates. For instance, let’s assume that the user suspects that a
+frequently-traded stock has an average of uninformed trading intensity
+for buys and sells between <code>12000</code> and <code>15000</code>.
+They generate a single sample dataset for this scenario as follows:</p>
+<pre class="r"><code>mpindata &lt;- generatedata_mpin(layers=2, ranges = list(eps.b=c(12000, 15000), eps.s=c(12000,15000)), verbose = FALSE)</code></pre>
+<p>The details of the generated sample dataset can be displayed with the
+following code</p>
+<pre class="r"><code>show(mpindata)</code></pre>
+<pre class="r-output"><code>## ----------------------------------
+## Data series successfully generated
 ## ----------------------------------
-## Likelihood factorization: Ersan and Ghachem (2022b)
-## Estimation Algorithm     : Expectation-Conditional Maximization
-## Initial parameter sets   : Ersan and Ghachem (2022b)
+## Simulation model     : MPIN model
+## Number of layers : 2 layer(s)
+## Number of trading days   : 60 days
+## ----------------------------------
+## Type object@data to get the simulated data
+## 
+## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span> 
+## 
+## ===========  ==================  ==================  =============
+## Variables    Theoretical.        Empirical.          Aggregates.  
+## ===========  ==================  ==================  =============
+## alpha        0.401875, 0.177702  0.383333, 0.183333  0.566667     
+## delta        0.130201, 0.433840  0.130435, 0.272727  0.176471     
+## mu           1263, 2546          1248.28, 2531.68    1663.5       
+## eps.b        13664               13677.59            13677.59     
+## eps.s        12714               12718.57            12718.57     
+## ----                                                              
+## Likelihood   -                   (813.651)           (813.651)    
+## mpin         -                   0.03448             0.03448      
+## ===========  ==================  ==================  =============
+## 
+## -------
+## Running time: 0.004 seconds
+</code></pre>
+<p>You access the sequences of buys, and sells through the slot
+<code>@data</code> of the object <code>pindata</code>.</p>
+<pre class="r"><code>show(mpindata@data[1:10, ])</code></pre>
+<pre class="r-output"><code>##        b     s
+## 1  13791 13909
+## 2  14853 12806
+## 3  13862 12723
+## 4  13623 12623
+## 5  13702 12707
+## 6  15018 12837
+## 7  14947 12936
+## 8  14762 12594
+## 9  13706 12556
+## 10 14806 12828
+</code></pre>
+<p>You can, now use the dataset object <code>mpindata</code> to check
+the accuracy of the different estimation functions, namely
+<code>mpin_ml()</code>, and <code>mpin_ecm()</code>. You can do that by
+comparing the empirical PIN value derived from the sample dataset to the
+estimated PIN value of the estimation functions. Let us start with
+displaying the empirical PIN value obtained from the sample dataset.
+This value can be accessed through the slot <code>@emp.pin</code> of the
+dataset object, which stores the empirical PIN value computed from the
+sequences of buys and sells generated. Please refer to the documentation
+of <code>generatedata_mpin()</code> for more information.</p>
+<pre class="r"><code>actualmpin &lt;- unlist(mpindata@emp.pin)
+show(actualmpin)</code></pre>
+<pre class="r-output"><code>##       MPIN 
+## 0.03448024
+</code></pre>
+<p>Estimate the MPIN model using the functions <code>mpin_ml()</code>,
+and <code>mpin_ecm</code>, and display the estimated MPIN values.</p>
+<pre class="r"><code>model_ml &lt;- mpin_ml(data=mpindata@data, verbose = FALSE)
+model_ecm &lt;- mpin_ecm(data=mpindata@data, verbose = FALSE)
+mlmpin &lt;- model_ml@mpin
+ecmpin &lt;- model_ecm@mpin
+estimates &lt;- setNames(c(mlmpin, ecmpin), c(&quot;ML&quot;, &quot;ECM&quot;))
+show(estimates)</code></pre>
+<pre class="r-output"><code>##         ML        ECM 
+## 0.03454762 0.03454334
+</code></pre>
+<p>Now calculate the absolute errors of both estimation methods.</p>
+<pre class="r"><code>errors &lt;- abs(actualmpin - estimates)
+show(errors)</code></pre>
+<pre class="r-output"><code>##           ML          ECM 
+## 6.738051e-05 6.309936e-05
+</code></pre>
+<p>The function <code>generatedata_mpin()</code> can generate a
+<code>data.series</code> object that contains a collection of
+<code>dataset</code> objects. For instance, the user can generate a
+collection of 10 datasets, whose data sequences span 60 days, and
+contain 3 layers, and use it to check the accuracy of the MPIN
+estimation.</p>
+<pre class="r"><code>size &lt;- 10
+collection &lt;- generatedata_mpin(series = size, layers = 3, verbose = FALSE)
+show(collection)</code></pre>
+<pre class="r-output"><code>## ----------------------------------
+## Simulated data successfully generated
+## ----------------------------------
+## Simulation model     : MPIN model
+## Number of layers : 3 layer(s)
+## Number of datasets   : 10 datasets
+## Number of trading days   : 60 days
+## ----------------------------------
+## Type object@datasets to access the list of dataset objects
+## 
+## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span>  
+## 
+## -------
+## Running time: 0.048 seconds
+</code></pre>
+<pre class="r"><code>accuracy &lt;- devmpin &lt;- 0
+for (i in 1:size) {
+    sdata &lt;- collection@datasets[[i]]
+    model &lt;- mpin_ml(sdata@data, xtraclusters = 3, verbose=FALSE)
+    accuracy &lt;- accuracy + (sdata@layers == model@layers)
+    devmpin &lt;- devmpin + abs(sdata@emp.pin - model@mpin)
+    
+}
+cat(&#39;The accuracy of layer detection: &#39;, paste0(accuracy*(100/size),&quot;%.\n&quot;), sep=&quot;&quot;)</code></pre>
+<pre class="r-output"><code>## The accuracy of layer detection: 90%.
+</code></pre>
+<pre class="r"><code>cat(&#39;The average error in MPIN estimates: &#39;, devmpin/size, &quot;.\n&quot;, sep=&quot;&quot;)</code></pre>
+<pre class="r-output"><code>## The average error in MPIN estimates: 0.002195456.
+</code></pre>
+</div>
+<div id="sample-datasets-for-the-adjpin-model" class="section level2">
+<h2>Sample datasets for the ADJPIN model</h2>
+<hr />
+<p>The AdjPIN model is an extension of the PIN model that includes the
+possibility of liquidity shocks. To obtain a sample dataset distributed
+according to the assumptions of the AdjPIN model, users can use the
+function <code>generatedata_adjpin()</code>. Generically, this is done
+as follows:</p>
+<pre class="r"><code>generatedata_adjpin(...)</code></pre>
+<p>If the user desires to create 10 sample datasets for frequently
+traded stock, they can specify high values or ranges for the trade
+intensity rates. For instance, let’s assume that the user suspects that
+a frequently-traded stock has an average of uninformed trading intensity
+for buys and sells between <code>10000</code> and
+<code>15000</code>.</p>
+<pre class="r"><code>adjpindatasets &lt;- generatedata_adjpin(series = 10, ranges = list(eps.b=c(10000, 15000), eps.s=c(10000,15000)), verbose = FALSE)</code></pre>
+<p>The details of the generated sample data series can be displayed with
+the following code:</p>
+<pre class="r"><code>show(adjpindatasets)</code></pre>
+<pre class="r-output"><code>## ----------------------------------
+## Simulated data successfully generated
+## ----------------------------------
+## Simulation model     : AdjPIN model
 ## Model Restrictions   : Unrestricted model
+## Number of datasets   : 10 datasets
+## Number of trading days   : 60 days
 ## ----------------------------------
-## 20 initial set(s) are used in the estimation 
-## Type object@initialsets to see the initial parameter sets used
+## Type object@datasets to access the list of dataset objects
 ## 
-## [0;37;45m AdjPIN model [0m 
-## 
-## ===========  ==============
-## Variables    Estimates     
-## ===========  ==============
-## alpha        0.73334       
-## delta        0.136362      
-## theta        0.062512      
-## theta&#39;       0.636362      
-## ----                       
-## eps.b        337.16        
-## eps.s        335.13        
-## mu.b         599.17        
-## mu.s         872.04        
-## d.b          912.72        
-## d.s          1.99          
-## ----                       
-## Likelihood   (893.682)     
-## adjPIN       0.295165      
-## PSOS         0.279629      
-## ===========  ==============
+## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span>  
 ## 
 ## -------
-## Running time: 0.435 seconds</code></pre>
-</div>
-<div id="example-4-estimate-the-volume-adjusted-pin-model" class="section level3">
-<h3>Example 4: Estimate the Volume-adjusted PIN model</h3>
-<hr />
-<p>We run a VPIN estimation on preloaded dataset <code>hfdata</code> of
-100 000 observations with <code>timebarsize</code> of <code>5</code>
-minutes (<code>300</code> seconds).</p>
-<pre class="r"><code>estimate.vpin &lt;- vpin(hfdata, timebarsize = 300)</code></pre>
-<pre><code>## [+] VPIN Estimation started.
-##   |-[1] Checking and preparing the data...
-##   |-[2] Creating 300-second timebars...[~ 2 seconds]
-##   |-[3] Calculating Volume Bucket Size (VBS) and Sigma(DP)...
-##   |-[4] Breaking up large 300-second timebars&#39; volume...
-##   |-[5] Assigning 300-second timebars into buckets...
-##   |-[6] Balancing timebars and adjusting bucket sizes to VBS...
-##   |-[7] Calculating aggregate bucket data...
-##   |-[8] Calculating VPIN vector...
-## [+] VPIN estimation completed</code></pre>
-<pre class="r"><code>show(estimate.vpin)</code></pre>
-<pre><code>## ----------------------------------
-## VPIN estimation completed successfully.
+## Running time: 0.151 seconds
+</code></pre>
+<p>You access the first dataset from <code>adjpindata</code> using this
+code:</p>
+<pre class="r"><code>adjpindata &lt;- adjpindatasets@datasets[[1]]
+show(adjpindata)</code></pre>
+<pre class="r-output"><code>## ----------------------------------
+## Data series successfully generated
 ## ----------------------------------
-## Type object@vpin to access the VPIN vector.
-## Type object@bucketdata to access data used to construct the VPIN vector.
-## Type object@dailyvpin to access the daily VPIN vectors.
+## Simulation model     : AdjPIN model
+## Model Restrictions   : Unrestricted model
+## Number of trading days   : 60 days
+## ----------------------------------
+## Type object@data to get the simulated data
 ## 
-## [+] VPIN descriptive statistics
+## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span> 
 ## 
-## |      | Min.  | 1st Qu. | Median | Mean  | 3rd Qu. | Max.  | NA&#39;s |
-## |:-----|:-----:|:-------:|:------:|:-----:|:-------:|:-----:|:----:|
-## |value | 0.101 |  0.185  | 0.238  | 0.244 |  0.29   | 0.636 |  49  |
-## 
-## 
-## [+] VPIN parameters
-## 
-## | tbSize | buckets | samplength |   VBS    | #days |
-## |:------:|:-------:|:----------:|:--------:|:-----:|
-## |  300   |   50    |     50     | 36321.25 |  77   |
+## ===========  ==============  ============
+## Variables    Theoretical.    Empirical.  
+## ===========  ==============  ============
+## alpha        0.624592        0.7         
+## delta        0.718889        0.571429    
+## theta        0.118567        0.166667    
+## theta&#39;       0.606026        0.571429    
+## ----                                     
+## eps.b        11844           11853.15    
+## eps.s        10496           10495.63    
+## mu.b         57445           57373.47    
+## mu.s         65080           65020.57    
+## d.b          10031           9968.69     
+## d.s          10622           10612.54    
+## ----                                     
+## Likelihood                   (890.219)   
+## adjPIN       0.558           0.578       
+## PSOS         0.124           0.124       
+## ===========  ==============  ============
 ## 
 ## -------
-## Running time: 3.753 seconds</code></pre>
-<p>Plot the unweighted daily vpin stored at the variable
-<code>dvpin</code> in the dataframe <code>dailyvpin</code> stored at the
-slot <code>@dailyvpin</code> of the object
-<code>estimate.vpin</code>.</p>
-<pre class="r"><code>plot(estimate.vpin@dailyvpin$dvpin ~seq_len(nrow(estimate.vpin@dailyvpin)),
-     lwd=1 , type=&quot;l&quot; , bty=&quot;n&quot; , xlab=&quot;day&quot; , ylab=&quot;daily vpin&quot;, 
-     col=rgb(0.2,0.4,0.6,0.8) )</code></pre>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAA5FBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZmYAZrY6AAA6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kJA6kLY6kNtcha1mAABmOgBmOjpmZjpmZmZmZpBmkJBmkLZmkNtmtrZmtttmtv+QOgCQOjqQZgCQZjqQZmaQkDqQkGaQkLaQtraQttuQtv+Q29uQ2/+2ZgC2Zjq2kDq2kGa2kJC2kLa2tpC2tra2ttu227a229u22/+2///bkDrbkGbbtmbbtpDbtrbb25Db27bb29vb2//b/7bb////tmb/25D/27b/29v//7b//9v////63zUKAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3dbYPaVpqncUicdcWZdmZctqe6PWtn2r07ya4r6+2urJNKnLEzLpdNff/vs0iAECAhnfs8/Y+4fi+6UxRIdyG4DEjA7A4AYDLLPQAAlIqAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQADAioABgREABwIiAAoARAQUAIwIKAEYEFACMCCgAGBFQ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" width="672" /></p>
-</div>
-<div id="example-5-estimate-the-adjpin-model-using-aggregated-high-frequency-data" class="section level3">
-<h3>Example 5: Estimate the AdjPIN model using aggregated high-frequency
-data</h3>
-<hr />
-<p>We use the preloaded high-frequency dataset <code>hfdata</code>,
-prepare it for aggregation by deleting the variable
-<code>volume</code>.</p>
-<pre class="r"><code>data &lt;- hfdata
-data$volume &lt;- NULL</code></pre>
-<p>We classify data using the LR algorithm with a time lag of
-<code>500</code> milliseconds (<code>0.5 s</code>), using the function
-aggregate_data().</p>
-<pre class="r"><code>daytrades &lt;- aggregate_trades(data, algorithm = &quot;LR&quot;, timelag = 500)</code></pre>
-<pre><code>## [+] Trade classification started
-##   |[=] Classification algorithm         : LR algorithm
-##   |[=] Number of trades in dataset      : 100 000 trades
-##   |[=] Time lag of lagged variables     : 500 milliseconds
-##   |[1] Computing lagged variables       : using parallel processing
-##   |+++++++++++++++++++++++++++++++++++++| 100% of variables computed
-##   |[=] Computed lagged variables        : in 4.956 seconds
-##   |[2] Computing aggregated trades      : using lagged variables
-## [+] Trade classification completed                    </code></pre>
-<p>We use the obtained dataset to estimate the (adjusted) probability of
-informed trading via the two available estimated methods, i.e, the
-standard Maximum-likelihood method, and the Expectation-Maximization
-algorithm.</p>
-<pre class="r"><code>adjpin_ml &lt;- adjpin(daytrades, method = &quot;ML&quot;, initialsets = &quot;GE&quot;)</code></pre>
-<pre><code>## [+] AdjPIN estimation started
-##   |[1] Computing initial parameter sets : 20 GE initial sets generated
-##   |[2] Estimating the AdjPIN model      : Maximum-likelihood Standard Estimation
-##   |+++++++++++++++++++++++++++++++++++++| 100% of AdjPIN estimation completed
-## [+] AdjPIN estimation completed</code></pre>
-<pre class="r"><code>adjpin_ecm &lt;- adjpin(daytrades, method = &quot;ECM&quot;, initialsets = &quot;GE&quot;)</code></pre>
-<pre><code>## [+] AdjPIN estimation started
-##   |[1] Computing initial parameter sets : 20 GE initial sets generated
-##   |[2] Estimating the AdjPIN model      : Expectation-Conditional Maximization algorithm
-##   |+++++++++++++++++++++++++++++++++++++| 100% of AdjPIN estimation completed
-## [+] AdjPIN estimation completed</code></pre>
-<p>Compare the estimated parameters obtained from the ML, and ECM
-parameters.</p>
-<pre class="r"><code>adj.prob &lt;- rbind(adjpin_ml@parameters[1:4], adjpin_ecm@parameters[1:4])
-rownames(adj.prob) &lt;- c(&quot;ML&quot;, &quot;ECM&quot;)</code></pre>
-<pre><code>## Probability terms in ML and ECM estimations of the AdjPIN model</code></pre>
-<pre><code>##         alpha     delta     theta    thetap
-## ML  0.5925374 0.1511567 0.3597389 0.9999995
-## ECM 0.5923700 0.1513750 0.3600324 1.0000000</code></pre>
-<pre class="r"><code>adj.params &lt;- rbind(adjpin_ml@parameters[5:10], adjpin_ecm@parameters[5:10])
-rownames(adj.params) &lt;- c(&quot;ML&quot;, &quot;ECM&quot;)</code></pre>
-<pre><code>## Rate parameters of ML and ECM estimations of the AdjPIN model</code></pre>
-<pre><code>##        eps.b    eps.s    mu.b     mu.s      d.b     d.s
-## ML  549.8239 546.3564 47.7612 71.67589 212.7528 223.720
-## ECM 549.8330 546.3330 47.7320 71.74700 212.7820 223.747</code></pre>
-</div>
+## Running time: 0.018 seconds
+</code></pre>
+<p>You can, now use the dataset object <code>adjpindata</code> to check
+the accuracy of the different estimation functions, namely MLE, and ECM
+algorithms. You can do that by comparing the empirical adjpin, and psos
+values derived from the sample dataset to the estimated adjpin, and psos
+values obtained from the estimation functions. Let us start with
+displaying the empirical adjpin, and psos values obtained from the
+sample dataset. These values can be accessed through the slot
+<code>@emp.pin</code> of the dataset object, which stores the empirical
+adjpin/psos value computed from the sequences of buys and sells
+generated. Please refer to the documentation of
+<code>generatedata_adjpin()</code> for more information.</p>
+<pre class="r"><code>actualpins &lt;- unlist(adjpindata@emp.pin)
+show(actualpins)</code></pre>
+<pre class="r-output"><code>##    adjpin      psos 
+## 0.5775748 0.1237669
+</code></pre>
+<p>Estimate the AdjPIN model using <code>adjpin(method=&quot;ML&quot;)</code>, and
+<code>adjpin(method=&quot;ECM&quot;</code>, and display the estimated adjpin/psos
+values.</p>
+<pre class="r"><code>model_ml &lt;- adjpin(data=adjpindata@data, method = &quot;ML&quot;, verbose = FALSE)
+model_ecm &lt;- adjpin(data=adjpindata@data, method = &quot;ECM&quot;, verbose = FALSE)
+mlpins &lt;- c(model_ml@adjpin, model_ml@psos)
+ecmpins &lt;- c(model_ecm@adjpin, model_ecm@psos)
+estimates &lt;- rbind(mlpins, ecmpins)
+colnames(estimates) &lt;- c(&quot;adjpin&quot;, &quot;psos&quot;)
+rownames(estimates) &lt;- c(&quot;ML&quot;, &quot;ECM&quot;)
+show(estimates)</code></pre>
+<pre class="r-output"><code>##        adjpin      psos
+## ML  0.5773024 0.1238676
+## ECM 0.5773015 0.1238636
+</code></pre>
+<p>Now calculate the absolute errors of both estimation methods.</p>
+<pre class="r"><code>errors &lt;- abs(estimates - rbind(actualpins, actualpins))
+show(errors)</code></pre>
+<pre class="r-output"><code>##           adjpin         psos
+## ML  0.0002723645 1.006566e-04
+## ECM 0.0002732715 9.671608e-05
+</code></pre>
 </div>
 <div id="getting-help" class="section level2">
 <h2>Getting help</h2>

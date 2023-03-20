@@ -11,7 +11,7 @@
 ##    Montasser Ghachem
 ##
 ## Last updated:
-##    2022-06-01
+##    2023-03-17
 ##
 ## License:
 ##    GPL 3
@@ -541,7 +541,7 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
 
     # After naming the columns, only keep the columns that are not all zeros
     # This reduces the size of the dataframe, and removes empty layers
-    runs <- runs[, colSums(runs) != 0]
+    runs <- runs[, colSums(runs, na.rm = TRUE) != 0]
 
     # Get the list of all likelihood. The number 'convergent' is the number of
     # all runs, for which the likelihood value is finite. If convergent is
@@ -933,20 +933,14 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
 
       if (sum(posterior_mx) == 0) return(list(interrupted = T))
 
+      # Replace the content of a row whose sum is zero by equiprobable
+      # assignment to clusters. The observations has equal probability to
+      # belong to any of the six clusters.
       daily_posterior <- rowSums(posterior_mx)
       zerorows <- which(daily_posterior == 0)
+      if (length(zerorows) > 0)
+        posterior_mx[zerorows,] <- rep(1/6,6)
 
-      if (length(zerorows) > 0) {
-        dposterior_mx <- as.data.frame(posterior_mx)
-        nonzeros <- dposterior_mx[-c(zerorows), ]
-        av_dposterior <-  rep(1 / ncol(posterior_mx), ncol(posterior_mx))
-        allzeros <- as.data.frame(t(replicate(length(zerorows), av_dposterior)))
-        rownames(allzeros) <- zerorows
-        dposterior_mx <- rbind(nonzeros, allzeros)
-        dposterior_mx <- dposterior_mx[
-          order(as.numeric(rownames(dposterior_mx))), ]
-        posterior_mx <- unname(as.matrix(dposterior_mx))
-      }
 
       # yn: vector of cluster membership where yn(ij) contain the prob. that
       # obs. i belongs to cluster j. This posterior distribution over clusters
@@ -956,22 +950,24 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
       # ------------------------------------------------------------------------
       yn <- sweep(posterior_mx, 1, rowSums(posterior_mx, na.rm = TRUE), `/`)
 
+      newdistrib <- colMeans(yn, na.rm = TRUE)
+
       if (mergelayers) {
 
-        dx <- distribution
-        alpha <- dx[2:(layers + 1)] + dx[(layers + 2):(2 * layers + 1)]
+        dx <- newdistrib
+        alpha <- dx[seq(3, cls, 2)] + dx[seq(2, cls, 2)]
         todrop <- which(alpha < minalpha)
 
         # Drop the information layers whose alpha is too small (<minalpha)
         # ----------------------------------------------------------------------
         if (length(todrop) > 0) {
 
-          dropped <- .xmpin$drop_layers(distribution, todrop, muj)
+          dropped <- .xmpin$drop_layers(newdistrib, todrop, muj)
 
           if (!is.null(dropped)) {
 
             if(length(dropped$distrib) < 3)
-              return(list(interrupted = T, distribution = distribution))
+              return(list(interrupted = T, distribution = newdistrib))
 
             return(list(
               tonext = T,
@@ -988,12 +984,12 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
 
         # Merge clusters where the values of mu's are very close to one another.
         # ----------------------------------------------------------------------
-        merged <- .xmpin$merge_layers(distribution, eb, es, muj, layers)
+        merged <- .xmpin$merge_layers(newdistrib, eb, es, muj, layers)
 
         if (!is.null(merged)) {
 
           if(length(merged$distrib) < 3)
-            return(list(interrupted = T, distribution = distribution))
+            return(list(interrupted = T, distribution = newdistrib))
 
           return(list(
             tonext = T,
@@ -1006,7 +1002,6 @@ mpin_ecm <- function(data, layers = NULL, xtraclusters = 4, initialsets = NULL,
         }
       }
 
-      newdistrib <- colMeans(yn, na.rm = TRUE)
 
       # There are some conditions, when fulfilled, the ECM algorithm breaks
       # either NA values for yn or less than three clusters or alpha is equal to
