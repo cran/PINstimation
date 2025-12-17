@@ -1,12 +1,16 @@
+utils::globalVariables(c(
+  "interval", "price", "volume", "timestamp", "day", "dp",
+  "bvol", "svol", "duration", "starttime", "sumvD", "sumD",
+  "dvpin", "dwvpin", "alpha", "eb", "es", "loglik"
+))
+
+
+
 .onLoad <- function(libname = find.package("PINstimation"),
                     pkgname = "PINstimation") {
 
   # Initialize the display digits to its default values.
   set_display_digits(list(firstrun = TRUE))
-
-  # Adjust future.globals.maxSize to allow for the size of the
-  # dataset at hand.
-  options(future.globals.maxSize = +Inf)
 
   # Initialize the option "numberoftradingdays" which will store
   # the number of trades in the dataset 'data'. It will serve as
@@ -46,6 +50,7 @@
 
   boxtext <- function(title, body, size = 85) {
 
+    xcite = "| Please cite as:\n| Ghachem, M., & Ersan, O. (2023). PINstimation: An R Package for Estimating\n| Probability of Informed Trading Models. The R Journal, 15(2), 145-168.\n"
     xtitle <- paste("\n", ux$color(
       fg = "1;34", bg = 49,
       x = paste("| ", title, "\n", sep = "")), sep = "")
@@ -57,14 +62,14 @@
       paste(unlist(xcontent), collapse = "", sep = ""),
       xbar, sep = "")
     xcontent <- ux$color(fg = 34, x = xcontent)
-    xmessage <- paste(xtitle, xcontent, sep = "")
+    xmessage <- paste(xtitle,xbar, xcite,xbar, xcontent, sep = "")
     xmessage <-  ux$color(fg = 34, x = xmessage)
 
     return(xmessage)
 
   }
 
-  startup <- boxtext(title = "WELCOME TO PINSTIMATION 0.1.1",
+  startup <- boxtext(title = "WELCOME TO PINSTIMATION 0.2.0",
                      body = contentlist)
 
 

@@ -1634,7 +1634,7 @@ types of datasets: (1) A sequence of daily buys and sells (2) A
 high-frequency trading data. This is the reason why only two sample
 datasets are preloaded with the package, namely
 <code>dailytrades</code>, and <code>hfdata</code>. The users can also
-generate simulation data using the function
+generate simulated data using the function
 <code>generatedata_mpin()</code> for PIN, and MPIN models; and the
 function <code>generatedata_adjpin()</code> for the ADJPIN model. Below
 we provide some scenarios of creating sample datasets both for the PIN,
@@ -1643,7 +1643,7 @@ MPIN, and ADJPIN models.</p>
 <div id="sample-datasets-for-the-pin-model" class="section level2">
 <h2>Sample datasets for the PIN model</h2>
 <hr />
-<p>The PIN model is an multilayer PIN model with a single information
+<p>The PIN model is a multilayer PIN model with a single information
 layer. We can, therefore, use the function
 <code>generatedata_mpin()</code>, in order to generate sample data for
 the PIN model. Generically, this is done as follows:</p>
@@ -1673,14 +1673,14 @@ following code</p>
 ## ===========  ==============  ============  =============
 ## Variables    Theoretical.    Empirical.    Aggregates.  
 ## ===========  ==============  ============  =============
-## alpha        0.462853        0.4           0.4          
-## delta        0.635296        0.625         0.625        
-## mu           259             260.27        260.27       
-## eps.b        465             464.98        464.98       
-## eps.s        413             417.64        417.64       
+## alpha        0.441347        0.383333      0.383333     
+## delta        0.545978        0.521739      0.521739     
+## mu           242             245.69        245.69       
+## eps.b        428             422.16        422.16       
+## eps.s        340             340.35        340.35       
 ## ----                                                    
-## Likelihood   -               (602.573)     (602.573)    
-## mpin         -               0.105508      0.105508     
+## Likelihood   -               (589.731)     (589.731)    
+## mpin         -               0.109936      0.109936     
 ## ===========  ==============  ============  =============
 ## 
 ## -------
@@ -1690,16 +1690,16 @@ following code</p>
 <code>@data</code> of the object <code>pindata</code>.</p>
 <pre class="r"><code>show(pindata@data[1:10, ])</code></pre>
 <pre class="r-output"><code>##      b   s
-## 1  495 429
-## 2  455 424
-## 3  494 673
-## 4  471 713
-## 5  493 630
-## 6  742 396
-## 7  493 451
-## 8  482 630
-## 9  484 397
-## 10 444 435
+## 1  677 349
+## 2  394 352
+## 3  663 349
+## 4  433 322
+## 5  454 354
+## 6  431 555
+## 7  410 295
+## 8  638 329
+## 9  661 361
+## 10 691 331
 </code></pre>
 <p>You can, now use the dataset object <code>pindata</code> to check the
 accuracy of the different estimation functions. You can do that by
@@ -1712,8 +1712,8 @@ generated. Please refer to the documentation of
 <code>generatedata_mpin()</code> for more information.</p>
 <pre class="r"><code>actual &lt;- unlist(pindata@empiricals)
 show(actual)</code></pre>
-<pre class="r-output"><code>##    alpha    delta       mu    eps.b    eps.s 
-##   0.4000   0.6250 260.2712 464.9804 417.6444
+<pre class="r-output"><code>##       alpha       delta          mu       eps.b       eps.s 
+##   0.3833333   0.5217391 245.6936557 422.1632653 340.3541667
 </code></pre>
 <p>Estimate the PIN model using the function <code>pin_ea()</code>, and
 display the estimated parameters</p>
@@ -1721,13 +1721,13 @@ display the estimated parameters</p>
 estimates &lt;- model@parameters 
 show(estimates)</code></pre>
 <pre class="r-output"><code>##       alpha       delta          mu       eps.b       eps.s 
-##   0.3999997   0.6250055 260.2848636 465.3148049 417.3043139
+##   0.3833334   0.5217368 245.2719559 423.0591290 339.6197723
 </code></pre>
 <p>Now calculate the absolute errors of the estimation method.</p>
 <pre class="r"><code>errors &lt;- abs(actual - estimates)
 show(errors)</code></pre>
 <pre class="r-output"><code>##        alpha        delta           mu        eps.b        eps.s 
-## 2.803387e-07 5.455089e-06 1.362178e-02 3.344128e-01 3.401306e-01
+## 6.535650e-08 2.280731e-06 4.216998e-01 8.958637e-01 7.343943e-01
 </code></pre>
 </div>
 <div id="sample-datasets-for-the-mpin-model" class="section level2">
@@ -1767,33 +1767,33 @@ following code</p>
 ## ===========  ==================  ==================  =============
 ## Variables    Theoretical.        Empirical.          Aggregates.  
 ## ===========  ==================  ==================  =============
-## alpha        0.401875, 0.177702  0.383333, 0.183333  0.566667     
-## delta        0.130201, 0.433840  0.130435, 0.272727  0.176471     
-## mu           1263, 2546          1248.28, 2531.68    1663.5       
-## eps.b        13664               13677.59            13677.59     
-## eps.s        12714               12718.57            12718.57     
+## alpha        0.234876, 0.315287  0.183333, 0.450000  0.633333     
+## delta        0.586538, 0.016950  0.454545, 0.037037  0.157895     
+## mu           1023, 2504          1043.98, 2502.22    2080.1       
+## eps.b        14991               14978.75            14978.75     
+## eps.s        13264               13255.54            13255.54     
 ## ----                                                              
-## Likelihood   -                   (813.651)           (813.651)    
-## mpin         -                   0.03448             0.03448      
+## Likelihood   -                   (813.976)           (813.976)    
+## mpin         -                   0.044579            0.044579     
 ## ===========  ==================  ==================  =============
 ## 
 ## -------
-## Running time: 0.004 seconds
+## Running time: 0.011 seconds
 </code></pre>
 <p>You access the sequences of buys, and sells through the slot
-<code>@data</code> of the object <code>pindata</code>.</p>
+<code>@data</code> of the object <code>mpindata</code>.</p>
 <pre class="r"><code>show(mpindata@data[1:10, ])</code></pre>
 <pre class="r-output"><code>##        b     s
-## 1  13791 13909
-## 2  14853 12806
-## 3  13862 12723
-## 4  13623 12623
-## 5  13702 12707
-## 6  15018 12837
-## 7  14947 12936
-## 8  14762 12594
-## 9  13706 12556
-## 10 14806 12828
+## 1  15034 13106
+## 2  17532 13170
+## 3  15946 13246
+## 4  14905 13321
+## 5  15047 13192
+## 6  15176 13397
+## 7  14916 13106
+## 8  15057 13227
+## 9  17238 13181
+## 10 17575 13436
 </code></pre>
 <p>You can, now use the dataset object <code>mpindata</code> to check
 the accuracy of the different estimation functions, namely
@@ -1807,11 +1807,11 @@ sequences of buys and sells generated. Please refer to the documentation
 of <code>generatedata_mpin()</code> for more information.</p>
 <pre class="r"><code>actualmpin &lt;- unlist(mpindata@emp.pin)
 show(actualmpin)</code></pre>
-<pre class="r-output"><code>##       MPIN 
-## 0.03448024
+<pre class="r-output"><code>##      MPIN 
+## 0.0445794
 </code></pre>
 <p>Estimate the MPIN model using the functions <code>mpin_ml()</code>,
-and <code>mpin_ecm</code>, and display the estimated MPIN values.</p>
+and <code>mpin_ecm()</code>, and display the estimated MPIN values.</p>
 <pre class="r"><code>model_ml &lt;- mpin_ml(data=mpindata@data, verbose = FALSE)
 model_ecm &lt;- mpin_ecm(data=mpindata@data, verbose = FALSE)
 mlmpin &lt;- model_ml@mpin
@@ -1819,21 +1819,19 @@ ecmpin &lt;- model_ecm@mpin
 estimates &lt;- setNames(c(mlmpin, ecmpin), c(&quot;ML&quot;, &quot;ECM&quot;))
 show(estimates)</code></pre>
 <pre class="r-output"><code>##         ML        ECM 
-## 0.03454762 0.03454334
+## 0.04466447 0.04465845
 </code></pre>
 <p>Now calculate the absolute errors of both estimation methods.</p>
 <pre class="r"><code>errors &lt;- abs(actualmpin - estimates)
 show(errors)</code></pre>
 <pre class="r-output"><code>##           ML          ECM 
-## 6.738051e-05 6.309936e-05
+## 8.506868e-05 7.904695e-05
 </code></pre>
 <p>The function <code>generatedata_mpin()</code> can generate a
 <code>data.series</code> object that contains a collection of
-<code>dataset</code> objects. For instance, the user can generate a
-collection of 10 datasets, whose data sequences span 60 days, and
-contain 3 layers, and use it to check the accuracy of the MPIN
-estimation.</p>
-<pre class="r"><code>size &lt;- 10
+<code>dataset</code> objects. For instance, the user can generate
+layers, and use it to check the accuracy of the MPIN estimation.</p>
+<pre class="r"><code>size &lt;- 3
 collection &lt;- generatedata_mpin(series = size, layers = 3, verbose = FALSE)
 show(collection)</code></pre>
 <pre class="r-output"><code>## ----------------------------------
@@ -1841,7 +1839,7 @@ show(collection)</code></pre>
 ## ----------------------------------
 ## Simulation model     : MPIN model
 ## Number of layers : 3 layer(s)
-## Number of datasets   : 10 datasets
+## Number of datasets   : 3 datasets
 ## Number of trading days   : 60 days
 ## ----------------------------------
 ## Type object@datasets to access the list of dataset objects
@@ -1849,7 +1847,7 @@ show(collection)</code></pre>
 ## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span>  
 ## 
 ## -------
-## Running time: 0.048 seconds
+## Running time: 0.022 seconds
 </code></pre>
 <pre class="r"><code>accuracy &lt;- devmpin &lt;- 0
 for (i in 1:size) {
@@ -1860,10 +1858,10 @@ for (i in 1:size) {
     
 }
 cat(&#39;The accuracy of layer detection: &#39;, paste0(accuracy*(100/size),&quot;%.\n&quot;), sep=&quot;&quot;)</code></pre>
-<pre class="r-output"><code>## The accuracy of layer detection: 90%.
+<pre class="r-output"><code>## The accuracy of layer detection: 66.6666666666667%.
 </code></pre>
 <pre class="r"><code>cat(&#39;The average error in MPIN estimates: &#39;, devmpin/size, &quot;.\n&quot;, sep=&quot;&quot;)</code></pre>
-<pre class="r-output"><code>## The average error in MPIN estimates: 0.002195456.
+<pre class="r-output"><code>## The average error in MPIN estimates: 0.001239405.
 </code></pre>
 </div>
 <div id="sample-datasets-for-the-adjpin-model" class="section level2">
@@ -1875,13 +1873,13 @@ according to the assumptions of the AdjPIN model, users can use the
 function <code>generatedata_adjpin()</code>. Generically, this is done
 as follows:</p>
 <pre class="r"><code>generatedata_adjpin(...)</code></pre>
-<p>If the user desires to create 10 sample datasets for frequently
-traded stock, they can specify high values or ranges for the trade
-intensity rates. For instance, let’s assume that the user suspects that
-a frequently-traded stock has an average of uninformed trading intensity
+<p>If the user desires to create 2 sample datasets for frequently traded
+stock, they can specify high values or ranges for the trade intensity
+rates. For instance, let’s assume that the user suspects that a
+frequently-traded stock has an average of uninformed trading intensity
 for buys and sells between <code>10000</code> and
 <code>15000</code>.</p>
-<pre class="r"><code>adjpindatasets &lt;- generatedata_adjpin(series = 10, ranges = list(eps.b=c(10000, 15000), eps.s=c(10000,15000)), verbose = FALSE)</code></pre>
+<pre class="r"><code>adjpindatasets &lt;- generatedata_adjpin(series = 2, ranges = list(eps.b=c(10000, 15000),  eps.s=c(10000,15000)), verbose = FALSE)</code></pre>
 <p>The details of the generated sample data series can be displayed with
 the following code:</p>
 <pre class="r"><code>show(adjpindatasets)</code></pre>
@@ -1890,7 +1888,7 @@ the following code:</p>
 ## ----------------------------------
 ## Simulation model     : AdjPIN model
 ## Model Restrictions   : Unrestricted model
-## Number of datasets   : 10 datasets
+## Number of datasets   : 2 datasets
 ## Number of trading days   : 60 days
 ## ----------------------------------
 ## Type object@datasets to access the list of dataset objects
@@ -1898,10 +1896,10 @@ the following code:</p>
 ## <span style="color: #BBBBBB; background-color: #000000;"> Data simulation </span>  
 ## 
 ## -------
-## Running time: 0.151 seconds
+## Running time: 0.069 seconds
 </code></pre>
-<p>You access the first dataset from <code>adjpindata</code> using this
-code:</p>
+<p>You access the first dataset from <code>adjpindatasets</code> using
+this code:</p>
 <pre class="r"><code>adjpindata &lt;- adjpindatasets@datasets[[1]]
 show(adjpindata)</code></pre>
 <pre class="r-output"><code>## ----------------------------------
@@ -1918,25 +1916,25 @@ show(adjpindata)</code></pre>
 ## ===========  ==============  ============
 ## Variables    Theoretical.    Empirical.  
 ## ===========  ==============  ============
-## alpha        0.624592        0.7         
-## delta        0.718889        0.571429    
-## theta        0.118567        0.166667    
-## theta&#39;       0.606026        0.571429    
+## alpha        0.494418        0.383333    
+## delta        0.408723        0.304348    
+## theta        0.154106        0.189189    
+## theta&#39;       0.232658        0.217391    
 ## ----                                     
-## eps.b        11844           11853.15    
-## eps.s        10496           10495.63    
-## mu.b         57445           57373.47    
-## mu.s         65080           65020.57    
-## d.b          10031           9968.69     
-## d.s          10622           10612.54    
+## eps.b        12871           12864.68    
+## eps.s        14812           14816.58    
+## mu.b         47341           47294.52    
+## mu.s         51557           51307.28    
+## d.b          48409           48593.52    
+## d.s          48454           48353.23    
 ## ----                                     
-## Likelihood                   (890.219)   
-## adjPIN       0.558           0.578       
-## PSOS         0.124           0.124       
+## Likelihood                   (878.331)   
+## adjPIN       0.343           0.283       
+## PSOS         0.265           0.295       
 ## ===========  ==============  ============
 ## 
 ## -------
-## Running time: 0.018 seconds
+## Running time: 0.028 seconds
 </code></pre>
 <p>You can, now use the dataset object <code>adjpindata</code> to check
 the accuracy of the different estimation functions, namely MLE, and ECM
@@ -1952,10 +1950,10 @@ generated. Please refer to the documentation of
 <pre class="r"><code>actualpins &lt;- unlist(adjpindata@emp.pin)
 show(actualpins)</code></pre>
 <pre class="r-output"><code>##    adjpin      psos 
-## 0.5775748 0.1237669
+## 0.2832069 0.2952618
 </code></pre>
 <p>Estimate the AdjPIN model using <code>adjpin(method=&quot;ML&quot;)</code>, and
-<code>adjpin(method=&quot;ECM&quot;</code>, and display the estimated adjpin/psos
+<code>adjpin(method=&quot;ECM&quot;)</code>, and display the estimated adjpin/psos
 values.</p>
 <pre class="r"><code>model_ml &lt;- adjpin(data=adjpindata@data, method = &quot;ML&quot;, verbose = FALSE)
 model_ecm &lt;- adjpin(data=adjpindata@data, method = &quot;ECM&quot;, verbose = FALSE)
@@ -1966,15 +1964,15 @@ colnames(estimates) &lt;- c(&quot;adjpin&quot;, &quot;psos&quot;)
 rownames(estimates) &lt;- c(&quot;ML&quot;, &quot;ECM&quot;)
 show(estimates)</code></pre>
 <pre class="r-output"><code>##        adjpin      psos
-## ML  0.5773024 0.1238676
-## ECM 0.5773015 0.1238636
+## ML  0.2835816 0.2950904
+## ECM 0.2835771 0.2950969
 </code></pre>
 <p>Now calculate the absolute errors of both estimation methods.</p>
 <pre class="r"><code>errors &lt;- abs(estimates - rbind(actualpins, actualpins))
 show(errors)</code></pre>
 <pre class="r-output"><code>##           adjpin         psos
-## ML  0.0002723645 1.006566e-04
-## ECM 0.0002732715 9.671608e-05
+## ML  0.0003747311 0.0001713981
+## ECM 0.0003702344 0.0001649447
 </code></pre>
 </div>
 <div id="getting-help" class="section level2">

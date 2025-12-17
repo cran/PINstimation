@@ -1712,16 +1712,16 @@ one of the functions using parallel processing is called.</p>
 <pre class="r"><code>options(pinstimation.parallel.cores = -2)
 getOption(&quot;pinstimation.parallel.cores&quot;)</code></pre>
 <pre><code>## [1] -2</code></pre>
-<pre class="r"><code>xdata &lt;- hfdata
+<pre class="r"><code>xdata &lt;- hfdata[1:10000,]
 xdata$volume &lt;- NULL
 aggdata &lt;- aggregate_trades(xdata, timelag = 500, algorithm = &quot;LR&quot;)</code></pre>
 <pre><code>[+] Trade classification started
   | [#] Classification algorithm        : LR algorithm
-  | [#] Number of trades in dataset     : 100 000 trades
-  | [#] Time lag of lagged variables    : 500 milliseconds
+  | [#] Number of trades in dataset     : 10 000 trades
+  | [#] Time lag of lagged variables    : 500 microseconds
   | [1] Computing lagged variables      : using parallel processing
   |+++++++++++++++++++++++++++++++++++++| 100% of variables computed
-  | [#] Computed lagged variables       : in 4.384 seconds
+  | [#] Computed lagged variables       : in 4.423 seconds
   | [2] Computing aggregated trades     : using lagged variables
 [+] Trade classification completed</code></pre>
 <pre class="r"><code>getOption(&quot;pinstimation.parallel.cores&quot;)</code></pre>
@@ -1772,11 +1772,14 @@ scenarios of the function <code>mpin_ecm</code>:</p>
 <p>The sequential processing is used when the argument
 <code>is_parallel</code> is set to <code>FALSE</code>, or is missing
 since its default value is <code>FALSE</code>.</p>
-<pre class="r"><code>ecm.1 &lt;- mpin_ecm(data = dailytrades, is_parallel = FALSE)</code></pre>
+<p>Note: For efficiency purposes, we cap the number of initial parameter
+sets to 25 for all layers. The default is 100 initial parameter
+sets.</p>
+<pre class="r"><code>ecm.1 &lt;- mpin_ecm(data = dailytrades, is_parallel = FALSE, hyperparams = list(maxinit = 25))</code></pre>
 <pre><code>[+] MPIN estimation started
   |[1] Computing the range of layers    : information layers from 1 to 8
   |[2] Computing initial parameter sets : using algorithm of Ersan (2016)
-  |[=] Selecting initial parameter sets : max 100 initial sets per estimation
+  |[=] Selecting initial parameter sets : max 25 initial sets per estimation
   |[3] Estimating the MPIN model        : Expectation-Conditional Maximization algorithm
   |+++++++++++++++++++++++++++++++++++++| 100% of estimation completed [8 layer(s)]
   |[3] Selecting the optimal model      : using lowest Information Criterion (BIC)
@@ -1793,7 +1796,7 @@ sequential processing has been used.</p>
 ## Info. layers detected    : using Ghachem and Ersan (2022) [ECM]
 ## Selection criterion  : Bayes Information Criterion (BIC)
 ## ----------------------------------
-## 525 initial set(s) are used for all 8 estimations
+## 170 initial set(s) are used for all 8 estimations
 ## Type object@models for the estimation results for all models. 
 ## Type getSummary(object) for a summary of estimates for all models.
 ## 
@@ -1805,12 +1808,12 @@ sequential processing has been used.</p>
 ## alpha            0.216667, 0.050000, 0.483333
 ## delta            0.230769, 0.666667, 0.034483
 ## mu               602.88, 986.45, 1506.84     
-## eps.b            336.91                      
+## eps.b            336.9                       
 ## eps.s            335.89                      
 ## ----                                         
 ## Likelihood       (643.458)                   
-## mpin(j)          0.082619, 0.031196, 0.460648
-## mpin             0.574463                    
+## mpin(j)          0.082619, 0.031196, 0.460649
+## mpin             0.574464                    
 ## ----                                         
 ## AIC | BIC | AWE  1308.92, 1331.95, 1409.99   
 ## ===============  ============================
@@ -1820,17 +1823,17 @@ sequential processing has been used.</p>
 ## 
 ##              BIC      AIC      AWE    layers  #Sets  time
 ## ---------  -------  -------  -------  ------  -----  ----
-## model.1    6473.41  6462.94  6508.88    1         5  0.04
-## model.2    1633.51  1616.76  1690.27    2        15  0.31
-## model.3    1331.95  1308.92  1409.99    3        35  0.65
-## model.4    1331.95  1308.92  1409.99    3        70  1.33
-## model.5**  1331.95  1308.92  1409.99    3       100  1.78
-## model.6    1342.58  1313.26  1441.9     4       100  5.61
-## model.7    1342.58  1313.26  1441.9     4       100  9.67
-## model.8    1342.58  1313.26  1441.9     4       100  2.43
+## model.1    6473.41  6462.94  6508.88    1         5  0.08
+## model.2    1633.51  1616.76  1690.27    2        15  0.53
+## model.3    1331.95  1308.92  1409.99    3        25  0.62
+## model.4    1331.95  1308.92  1409.99    3        25  0.75
+## model.5    1331.95  1308.92  1409.99    3        25  1.27
+## model.6    1331.95  1308.92  1409.99    3        25  0.86
+## model.7    1331.95  1308.92  1409.99    3        25  0.83
+## model.8**  1331.95  1308.92  1409.99    3        25  1.07
 ## 
 ## -------
-## Running time: 21.82 seconds</code></pre>
+## Running time: 6.01 seconds</code></pre>
 </div>
 <div id="parallel-processing-number-of-sets-below-the-threshold" class="section level3">
 <h3>Parallel processing | number of sets below the threshold</h3>
@@ -1884,7 +1887,7 @@ processing is activated, but not used.</p>
 ## ===============  =========================
 ## 
 ## -------
-## Running time: 0.303 seconds</code></pre>
+## Running time: 0.618 seconds</code></pre>
 </div>
 <div id="parallel-processing-number-of-sets-above-the-threshold" class="section level3">
 <h3>Parallel processing | number of sets above the threshold</h3>
@@ -1937,7 +1940,7 @@ processing is activated, and used.</p>
 ## ===============  ============================
 ## 
 ## -------
-## Running time: 3.517 seconds</code></pre>
+## Running time: 1.988 seconds</code></pre>
 </div>
 </div>
 <div id="getting-help" class="section level2">

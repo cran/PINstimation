@@ -173,6 +173,8 @@
 #' \insertCite{Yan2012;textual}{PINstimation}.
 #' \item \link{vpin} estimates the volume-synchronized probability of informed
 #' trading (`VPIN`).
+#' \item \link{ivpin} estimates the improved volume-synchronized probability
+#' of informed trading (`IVPIN`).
 #' }
 #'
 #' @section Datasets:
@@ -209,12 +211,7 @@
 #'   `dataset`.
 #' }
 #'
-#' @author Montasser Ghachem <montasser.ghachem@pinstimation.com> \cr
-#' Department of Economics at Stockholm University, Stockholm, Sweden. \cr
-#'
-#' Oguz Ersan <oguz.ersan@pinstimation.com> \cr
-#' Department of International Trade and Finance at Kadir Has University,
-#' Istanbul, Turkey.\cr
+#' \@authors
 #'
 #' @references
 #'
@@ -239,4 +236,5 @@
 #'
 #'
 #' @name PINstimation-package
+"_PACKAGE"
 NULL

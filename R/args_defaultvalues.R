@@ -138,7 +138,7 @@
 
   confidence = c(0, 1),
 
-  timelag = c(0, +Inf),
+  timelag = c(-Inf, +Inf),
 
   tradinghours = c(1, +Inf),
 
@@ -210,7 +210,7 @@
     xcores <- ux$get_cores()
 
     if (!ux$is.integer(dfcores) || dfcores < 1 ||
-        dfcores > xcores || dfcores > 2) {
+        dfcores > xcores) {
       if (xcores > 1) xcores <- 2
       options(pinstimation.parallel.cores = xcores)
     }

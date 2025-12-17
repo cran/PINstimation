@@ -59,7 +59,7 @@ errors <- abs(actualmpin - estimates)
 show(errors)
 
 ## ----sample.mpin.1.7, results='markup'----------------------------------------
-size <- 10
+size <- 3
 collection <- generatedata_mpin(series = size, layers = 3, verbose = FALSE)
 show(collection)
 
@@ -76,7 +76,7 @@ cat('The accuracy of layer detection: ', paste0(accuracy*(100/size),"%.\n"), sep
 cat('The average error in MPIN estimates: ', devmpin/size, ".\n", sep="")
 
 ## ----sample.adjpin.1.1--------------------------------------------------------
-adjpindatasets <- generatedata_adjpin(series = 10, ranges = list(eps.b=c(10000, 15000), eps.s=c(10000,15000)), verbose = FALSE)
+adjpindatasets <- generatedata_adjpin(series = 2, ranges = list(eps.b=c(10000, 15000),  eps.s=c(10000,15000)), verbose = FALSE)
 
 ## ----sample.adjpin.1.2, results='markup'--------------------------------------
 show(adjpindatasets)
