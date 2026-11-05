@@ -1,3 +1,21 @@
+# PINstimation 0.2.2
+
+## Improvements
+
+* Reduced the number of initial parameter sets used in the
+  `adjpin()` documentation example from 20 to 10 to reduce
+  example execution time.
+  
+  
+# PINstimation 0.2.1
+
+## Bug fixes
+
+- Replaced `future::availableCores()` with
+  `parallelly::availableCores()` to improve compatibility
+  with future package updates.
+  
+
 # PINstimation 0.2.0
 
 ## New Features
